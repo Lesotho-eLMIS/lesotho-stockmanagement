@@ -11,19 +11,19 @@ services:
       - "53"
 
   nginx:
-    image: openlmis/nginx:1
+    image: openlmis/nginx:5
     ports:
       - "80:80"
     env_file: .manual-api-test-env
     depends_on: [consul]
 
   reference-ui:
-    image: openlmis/reference-ui
+    image: openlmis/reference-ui:5.2.7-SNAPSHOT
     env_file: .manual-api-test-env
     depends_on: [consul]
 
   stockmanagement:
-    image: openlmis/dev:7
+    image: openlmis/stockmanagement:5.1.10-SNAPSHOT
     ports:
       - "5005:5005"
       - "8080:8080"
@@ -31,17 +31,17 @@ services:
       - '..:/app'
       - 'gradlecache:/gradle'
     env_file: .manual-api-test-env
-    depends_on: [nginx,auth,referencedata,reference-ui]
+    depends_on: [log, db,nginx,auth,referencedata,reference-ui]
 
   auth:
-    image: openlmis/auth
+    image: openlmis/auth:4.3.4-SNAPSHOT
     env_file: .manual-api-test-env
     environment:
       JAVA_OPTS: '-Dflyway.locations=classpath:db/migration'
     depends_on: [consul,log,db]
 
   referencedata:
-    image: openlmis/referencedata
+    image: openlmis/referencedata:15.2.6-SNAPSHOT
     env_file: .manual-api-test-env
     environment:
       JAVA_OPTS: '-Dflyway.locations=classpath:db/migration'
@@ -55,6 +55,10 @@ services:
 
   log:
     image: openlmis/rsyslog:1
+
+  redis:
+    image: redis:3.2.12
+    depends_on: [consul]
 
 volumes:
   gradlecache:
