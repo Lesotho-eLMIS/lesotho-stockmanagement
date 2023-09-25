@@ -11,19 +11,19 @@ services:
       - "53"
 
   nginx:
-    image: openlmis/nginx:5
+    image: openlmis/nginx:${OL_NGINX_VERSION}
     ports:
       - "80:80"
     env_file: .manual-api-test-env
     depends_on: [consul]
 
   reference-ui:
-    image: openlmis/reference-ui:5.2.7-SNAPSHOT
+    image: openlmis/reference-ui:${OL_REFERENCE_UI_VERSION}
     env_file: .manual-api-test-env
     depends_on: [consul]
 
   stockmanagement:
-    image: openlmis/stockmanagement:5.1.10-SNAPSHOT
+    image: openlmis/stockmanagement:${OL_STOCKMANAGEMENT_VERSION}
     ports:
       - "5005:5005"
       - "8080:8080"
@@ -34,21 +34,21 @@ services:
     depends_on: [log, db,nginx,auth,referencedata,reference-ui]
 
   auth:
-    image: openlmis/auth:4.3.4-SNAPSHOT
+    image: openlmis/auth:${OL_AUTH_VERSION}
     env_file: .manual-api-test-env
     environment:
       JAVA_OPTS: '-Dflyway.locations=classpath:db/migration'
     depends_on: [consul,log,db]
 
   referencedata:
-    image: openlmis/referencedata:15.2.6-SNAPSHOT
+    image: openlmis/referencedata:${OL_REFERENCEDATA_VERSION}
     env_file: .manual-api-test-env
     environment:
       JAVA_OPTS: '-Dflyway.locations=classpath:db/migration'
     depends_on: [consul,log,db]
 
   db:
-    image: openlmis/postgres:12-debezium
+    image: openlmis/postgres:${OL_POSTGRES_VERSION}
     ports:
       - "5432:5432"
     env_file: .manual-api-test-env
