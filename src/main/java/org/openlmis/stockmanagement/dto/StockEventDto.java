@@ -44,7 +44,8 @@ public class StockEventDto {
   private UUID facilityId;
 
   private UUID programId;
-
+  private String dummy;
+  
   private String signature;
 
   private String documentNumber;

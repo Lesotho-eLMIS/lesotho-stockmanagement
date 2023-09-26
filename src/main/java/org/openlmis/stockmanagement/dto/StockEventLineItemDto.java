@@ -51,6 +51,7 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
   private UUID destinationId;
   private String destinationFreeText;
   private List<StockEventAdjustmentDto> stockAdjustments;
+  private String dummy;
 
   StockEventLineItem toEventLineItem() {
     // event is set in StockEventDto.toEvent()
