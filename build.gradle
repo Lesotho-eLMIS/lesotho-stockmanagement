@@ -86,6 +86,13 @@ dependencies {
     testCompile "nl.jqno.equalsverifier:equalsverifier:2.4"
     testCompile "be.joengenduvel.java.verifiers:to-string:1.0.2"
 
+    // Example dependency: Spring Core
+    //implementation "org.springframework:spring-core:5.3.10.RELEASE"
+    // Fetch the source code for debugging or reference
+    //implementation "org.springframework:spring-core:5.3.10.RELEASE:sources"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+
     runtime fileTree(dir: '/extensions/', include: '*.jar')
 }
 

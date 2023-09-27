@@ -62,6 +62,10 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
     );
   }
 
+  public boolean foo() {
+    return this.reasonId != null;
+  }
+
   public boolean hasReasonId() {
     return this.reasonId != null;
   }

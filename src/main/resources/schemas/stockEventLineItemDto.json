@@ -60,6 +60,18 @@
       "description": "Can be used to save additional data for line item.",
       "title": "extraData"
     }
+    ,
+    "dummy": {
+      "type": "string",
+      "description": "Can be used to save additional data for line item.",
+      "title": "dummy"
+    }
+    ,
+    "dummy2": {
+      "type": "string",
+      "description": "Can be used to save additional data for line item.",
+      "title": "dummy2"
+    }
   },
   "required": ["orderableId", "quantity"]
 }

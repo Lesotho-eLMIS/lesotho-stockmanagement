@@ -31,7 +31,7 @@ services:
       - '..:/app'
       - 'gradlecache:/gradle'
     env_file: .manual-api-test-env
-    depends_on: [log, db,nginx,auth,referencedata,reference-ui]
+    depends_on: [log, db,nginx,auth,referencedata,reference-ui,consul,redis]
 
   auth:
     image: openlmis/auth:${OL_AUTH_VERSION}
@@ -45,7 +45,7 @@ services:
     env_file: .manual-api-test-env
     environment:
       JAVA_OPTS: '-Dflyway.locations=classpath:db/migration'
-    depends_on: [consul,log,db]
+    depends_on: [consul,log,db,redis]
 
   db:
     image: openlmis/postgres:${OL_POSTGRES_VERSION}

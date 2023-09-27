@@ -8,6 +8,7 @@ services:
     ports:
       - "8080"
     env_file: .env
+    depends_on: [log, db]
   db:
     image: openlmis/postgres:12-debezium
     ports:
