@@ -13,98 +13,92 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.stockmanagement.dto;
+ package org.openlmis.stockmanagement.dto;
 
-import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
-import static java.util.Collections.emptyList;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.openlmis.stockmanagement.domain.common.VvmApplicable;
-import org.openlmis.stockmanagement.domain.event.StockEventLineItem;
-import org.openlmis.stockmanagement.domain.identity.IdentifiableByOrderableLot;
-import org.openlmis.stockmanagement.domain.physicalinventory.PhysicalInventoryLineItemAdjustment;
-
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApplicable {
-  private UUID orderableId;
-  private UUID lotId;
-  private Integer quantity;
-  private Map<String, String> extraData;
-  @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
-  private LocalDate occurredDate;
-  private UUID reasonId;
-  private String reasonFreeText;
-  private UUID sourceId;
-  private String sourceFreeText;
-  private UUID destinationId;
-  private String destinationFreeText;
-  private List<StockEventAdjustmentDto> stockAdjustments;
-  private String dummy;
-  private String dummy2;
-
-  StockEventLineItem toEventLineItem() {
-    // event is set in StockEventDto.toEvent()
-    return new StockEventLineItem(
-        orderableId, lotId, quantity, extraData, occurredDate, reasonId, reasonFreeText, sourceId,
-        sourceFreeText, destinationId, destinationFreeText, null, stockAdjustments()
-    );
-  }
-
-  public boolean foo() {
-    return this.reasonId != null;
-  }
-
-  public boolean hasReasonId() {
-    return this.reasonId != null;
-  }
-
-  public boolean hasReasonFreeText() {
-    return this.reasonFreeText != null;
-  }
-
-  public boolean hasLotId() {
-    return this.lotId != null;
-  }
-
-  public boolean hasDestinationFreeText() {
-    return this.destinationFreeText != null;
-  }
-
-  public boolean hasSourceFreeText() {
-    return this.sourceFreeText != null;
-  }
-
-  public boolean hasSourceId() {
-    return this.sourceId != null;
-  }
-
-  public boolean hasDestinationId() {
-    return this.destinationId != null;
-  }
-
-  /**
-   * Gets stock adjustments as {@link PhysicalInventoryLineItemAdjustment}.
-   */
-  public List<PhysicalInventoryLineItemAdjustment> stockAdjustments() {
-    if (null == stockAdjustments) {
-      return emptyList();
-    }
-
-    return stockAdjustments
-        .stream()
-        .map(StockEventAdjustmentDto::toPhysicalInventoryLineItemAdjustment)
-        .collect(Collectors.toList());
-  }
-}
+ import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
+ import static java.util.Collections.emptyList;
+ 
+ import com.fasterxml.jackson.annotation.JsonFormat;
+ import java.time.LocalDate;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.UUID;
+ import java.util.stream.Collectors;
+ import lombok.AllArgsConstructor;
+ import lombok.Getter;
+ import lombok.NoArgsConstructor;
+ import lombok.Setter;
+ import org.openlmis.stockmanagement.domain.common.VvmApplicable;
+ import org.openlmis.stockmanagement.domain.event.StockEventLineItem;
+ import org.openlmis.stockmanagement.domain.identity.IdentifiableByOrderableLot;
+ import org.openlmis.stockmanagement.domain.physicalinventory.PhysicalInventoryLineItemAdjustment;
+ 
+ @Setter
+ @Getter
+ @AllArgsConstructor
+ @NoArgsConstructor
+ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApplicable {
+   private UUID orderableId;
+   private UUID lotId;
+   private Integer quantity;
+   private Map<String, String> extraData;
+   @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+   private LocalDate occurredDate;
+   private UUID reasonId;
+   private String reasonFreeText;
+   private UUID sourceId;
+   private String sourceFreeText;
+   private UUID destinationId;
+   private String destinationFreeText;
+   private List<StockEventAdjustmentDto> stockAdjustments;
+ 
+   StockEventLineItem toEventLineItem() {
+     // event is set in StockEventDto.toEvent()
+     return new StockEventLineItem(
+         orderableId, lotId, quantity, extraData, occurredDate, reasonId, reasonFreeText, sourceId,
+         sourceFreeText, destinationId, destinationFreeText, null, stockAdjustments()
+     );
+   }
+ 
+   public boolean hasReasonId() {
+     return this.reasonId != null;
+   }
+ 
+   public boolean hasReasonFreeText() {
+     return this.reasonFreeText != null;
+   }
+ 
+   public boolean hasLotId() {
+     return this.lotId != null;
+   }
+ 
+   public boolean hasDestinationFreeText() {
+     return this.destinationFreeText != null;
+   }
+ 
+   public boolean hasSourceFreeText() {
+     return this.sourceFreeText != null;
+   }
+ 
+   public boolean hasSourceId() {
+     return this.sourceId != null;
+   }
+ 
+   public boolean hasDestinationId() {
+     return this.destinationId != null;
+   }
+ 
+   /**
+    * Gets stock adjustments as {@link PhysicalInventoryLineItemAdjustment}.
+    */
+   public List<PhysicalInventoryLineItemAdjustment> stockAdjustments() {
+     if (null == stockAdjustments) {
+       return emptyList();
+     }
+ 
+     return stockAdjustments
+         .stream()
+         .map(StockEventAdjustmentDto::toPhysicalInventoryLineItemAdjustment)
+         .collect(Collectors.toList());
+   }
+ }
