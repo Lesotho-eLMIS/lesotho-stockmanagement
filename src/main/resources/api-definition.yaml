@@ -25,6 +25,7 @@ documentation:
           otherwise accounting for stock.
         * Configuring the lists of valid desitnations and sources (places you may send and receive
           stock).
+        * Point of Delivery Events: enter point of delivery details
 
         This service does not currently support bin cards (ledgers for Stock in Inventory in a
         particular bin, room, shelf, etc), though it's expected that functionality will be added
@@ -47,6 +48,7 @@ schemas:
   - stockCardTemplate: !include schemas/stockCardTemplate.json
   - stockEventDto: !include schemas/stockEventDto.json
   - stockEventLineItemDto: !include schemas/stockEventLineItemDto.json
+  - pointOfDeliveryEventDto: !include schemas/pointOfDeliveryEventDto.json
 
   - stockCard: !include schemas/stockCard.json
   - stockCardPage: !include schemas/stockCard.json
@@ -263,6 +265,35 @@ traits:
 
           403:
             description: User does not have permission to create stock events for given facility and program.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+  /podEvents:
+      post:
+        is: [ secured ]
+        description: Create a new point of delivery event.
+        body:
+          application/json:
+            schema: pointOfDeliveryEventDto
+
+        responses:
+          201:
+            description: Point of delivery event has been processed with no validation error or persistence error.
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: uuid
+
+          400:
+            description: Failed to process point of delivery event due to validation error.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+          403:
+            description: User does not have permission to create point of delivery events for given facility (destination).
             body:
               application/json:
                   schema: localizedMessage

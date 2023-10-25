@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "description": "Point of delivery event",
+  "properties": {
+    "sourceId": {
+      "type": "string",
+      "description": "Indicates where orderables are received from. Can not be present along with destination id."
+    },
+    "sourceFreeText": {
+      "type": "string",
+      "description": "Remark of the source. Only allowed when source id is present and source id does not point to a facility in ref-data."
+    },
+    "destinationId": {
+      "type": "string",
+      "description": "During the 'ISSUE' event, destinationId indicates where orderables are issued to. Can not be present along with source id."
+    },
+    "destinationFreeText": {
+      "type": "string",
+      "description": "Remark of the destination. Only allowed when destination id is present and destination id does not point to a facility in ref-data."
+    },
+    "referenceNumber": {
+      "type": "string",
+      "description": "Reference number of the consignment/shipment."
+    },
+    "packingDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The date when this event occurred"
+    },
+    "packedBy": {
+      "type": "string",
+      "format": "date",
+      "description": "Person who packed consignment"
+    },
+    "numberOfCartons": {
+      "type": "integer",
+      "description": "Indicates quantity of cartons. Not allowed to be negative"
+    },
+    "numberOfContainers": {
+      "type": "integer",
+      "description": "Indicates quantity of containers. Not allowed to be negative"
+    },
+    "remarks": {
+      "type": "string",
+      "description": "Remarks for point of delivery event."
+    }
+  },
+  "required": ["sourceId", "destinationId", "numberOfCartons", "numberOfContainers"]
+}
