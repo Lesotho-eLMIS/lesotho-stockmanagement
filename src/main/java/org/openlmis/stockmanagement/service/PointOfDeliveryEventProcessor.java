@@ -82,7 +82,7 @@ public class PointOfDeliveryEventProcessor {
     profiler.start("DB_SAVE");
     UUID savedEventId = pointOfDeliveryEventsRepository.save(
             pointOfDeliveryEvent).getId();
-    LOGGER.debug("Saved stock event with id " + savedEventId);
+    LOGGER.debug("Saved point of delivery event with id " + savedEventId);
 
     return savedEventId;
   }
