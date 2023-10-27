@@ -20,9 +20,13 @@ import static java.time.ZonedDateTime.now;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +37,7 @@ import org.openlmis.stockmanagement.util.PointOfDeliveryEventProcessContext;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PointOfDeliveryEventDto {
 
   private UUID sourceId;
@@ -70,6 +75,37 @@ public class PointOfDeliveryEventDto {
         context.getCurrentUserId(), now(), referenceNumber, packingDate,
         packedBy, numberOfCartons, numberOfContainers, remarks);
     return pointOfDeliveryEvent;
+  }
+
+  /**
+   * Create from jpa model.
+   *
+   * @param pointOfDeliveryEvents inventory jpa model.
+   * @return created dto.
+   */
+  public static List<PointOfDeliveryEventDto> podToDto(
+        Collection<PointOfDeliveryEvent> pointOfDeliveryEvents) {
+
+    List<PointOfDeliveryEventDto> podDtos = new ArrayList<>(pointOfDeliveryEvents.size());
+    pointOfDeliveryEvents.forEach(i -> podDtos.add(podToDto(i)));
+    return podDtos;
+  }
+
+  private static PointOfDeliveryEventDto podToDto(PointOfDeliveryEvent pointOfDeliveryEvent) {
+    return PointOfDeliveryEventDto.builder()
+      .sourceId(pointOfDeliveryEvent.getSourceId())
+      .sourceFreeText(pointOfDeliveryEvent.getSourceFreeText())
+      .destinationId(pointOfDeliveryEvent.getDestinationId())
+      .destinationFreeText(pointOfDeliveryEvent.getDestinationFreeText())
+      .receivedByUserId(pointOfDeliveryEvent.getReceivedByUserId())
+      .receivingDate(pointOfDeliveryEvent.getReceivingDate())
+      .referenceNumber(pointOfDeliveryEvent.getReferenceNumber())
+      .packingDate(pointOfDeliveryEvent.getPackingDate())
+      .packedBy(pointOfDeliveryEvent.getPackedBy())
+      .numberOfCartons(pointOfDeliveryEvent.getNumberOfCartons())
+      .numberOfContainers(pointOfDeliveryEvent.getNumberOfContainers())
+      .remarks(pointOfDeliveryEvent.getRemarks())
+      .build();
   }
 
   public boolean hasSourceId() {

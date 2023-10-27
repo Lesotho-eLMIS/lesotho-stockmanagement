@@ -15,10 +15,13 @@
 
 package org.openlmis.stockmanagement.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.stockmanagement.domain.event.PointOfDeliveryEvent;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface PointOfDeliveryEventsRepository extends
         PagingAndSortingRepository<PointOfDeliveryEvent, UUID> {
+  List<PointOfDeliveryEvent> findByFacilityId(@Param("destinationId") UUID facilityId);
 }

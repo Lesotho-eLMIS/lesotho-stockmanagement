@@ -16,12 +16,15 @@
 package org.openlmis.stockmanagement.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.stockmanagement.dto.PointOfDeliveryEventDto;
 // import org.openlmis.stockmanagement.service.PermissionService;
 import org.openlmis.stockmanagement.service.PointOfDeliveryEventProcessor;
+import org.openlmis.stockmanagement.service.PointOfDeliveryService;
 import org.openlmis.stockmanagement.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Controller used to create point of delivery event.
@@ -49,6 +53,9 @@ public class PointOfDeliveryController extends BaseController {
 
   @Autowired
   private PointOfDeliveryEventProcessor pointOfDeliveryEventProcessor;
+
+  @Autowired
+  private PointOfDeliveryService pointOfDeliveryService;
 
   /**
    * Create point of delivery event.
@@ -73,6 +80,33 @@ public class PointOfDeliveryController extends BaseController {
     ResponseEntity<UUID> response = new ResponseEntity<>(createdPodId, CREATED);
 
     return stopProfiler(profiler, response);
+  }
+
+  /**
+   * List point of delivery event.
+   *
+   * @param destinationId a pod event bound to request body.
+   * @return List of pod events.
+   */
+  @RequestMapping(value = "podEvents", method = GET)
+  public List<PointOfDeliveryEventDto> getPointOfDeliveryEvents(
+      @RequestParam() UUID destinationId) {
+
+    LOGGER.debug("Try to load point of delivery events");
+
+    return pointOfDeliveryService.getPointOfDeliveryEventsByFacilityId(destinationId);
+
+    // Profiler profiler = getProfiler("LIST_POD_EVENTS", pointOfDeliveryEventDto);
+
+    //checkPermission(pointOfDeliveryEventDto, profiler.startNested("CHECK_PERMISSION"));
+
+    // profiler.start("PROCESS");
+    // UUID createdPodId = pointOfDeliveryEventProcessor.process(pointOfDeliveryEventDto);
+
+    // profiler.start("CREATE_RESPONSE");
+    // ResponseEntity<UUID> response = new ResponseEntity<>(createdPodId, CREATED);
+
+    //return stopProfiler(profiler, response);
   }
 
 }
