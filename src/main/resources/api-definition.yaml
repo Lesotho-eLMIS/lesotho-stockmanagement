@@ -298,6 +298,36 @@ traits:
               application/json:
                   schema: localizedMessage
 
+      get:
+        is: [ secured ]
+        description: Get point of delivery event
+        queryParameters:
+          destinationId:
+            required: true
+          
+        responses:
+          200:
+            description: |
+              Returns a default templte with all fields set to not display when no query parameters are passed.
+
+              Returns template that matches destination id.
+            headers:
+              X-Content-Type-Options:
+              X-XSS-Protection:
+            body:
+              application/json:
+                schema: pointOfDeliveryEventDto
+          404:
+            description: Point of delivery events not found for the given query parameter.
+            body:
+              application/json:
+                schema: localizedMessage
+          400:
+            body:
+              application/json:
+                  schema: localizedMessage
+            description: Provided query parameters are not correctly formatted.
+
   /stockCardSummaries:
       get:
         is: [ secured , paginated ]

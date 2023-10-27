@@ -16,6 +16,7 @@
 package org.openlmis.stockmanagement.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -43,8 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Controller used to create point of delivery event.
  */
 @Controller
-@Transactional
-@RequestMapping("/api")
+@RequestMapping("/api/podEvents")
 public class PointOfDeliveryController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(PointOfDeliveryController.class);
 
@@ -63,7 +63,8 @@ public class PointOfDeliveryController extends BaseController {
    * @param pointOfDeliveryEventDto a pod event bound to request body.
    * @return created pod event's ID.
    */
-  @RequestMapping(value = "podEvents", method = POST)
+  @Transactional
+  @RequestMapping(method = POST)
   public ResponseEntity<UUID> createPointOfDeliveryEvent(
         @RequestBody PointOfDeliveryEventDto pointOfDeliveryEventDto) {
 
@@ -88,14 +89,16 @@ public class PointOfDeliveryController extends BaseController {
    * @param destinationId a pod event bound to request body.
    * @return List of pod events.
    */
-  @RequestMapping(value = "podEvents", method = GET)
-  public List<PointOfDeliveryEventDto> getPointOfDeliveryEvents(
+  @RequestMapping(method = GET)
+  public ResponseEntity<List<PointOfDeliveryEventDto>> getPointOfDeliveryEvents(
       @RequestParam() UUID destinationId) {
 
     LOGGER.debug("Try to load point of delivery events");
 
-    return pointOfDeliveryService.getPointOfDeliveryEventsByFacilityId(destinationId);
-
+    List<PointOfDeliveryEventDto> podsToReturn = 
+        pointOfDeliveryService.getPointOfDeliveryEventsByDestinationId(destinationId);
+    
+    return new ResponseEntity<>(podsToReturn, OK);
     // Profiler profiler = getProfiler("LIST_POD_EVENTS", pointOfDeliveryEventDto);
 
     //checkPermission(pointOfDeliveryEventDto, profiler.startNested("CHECK_PERMISSION"));

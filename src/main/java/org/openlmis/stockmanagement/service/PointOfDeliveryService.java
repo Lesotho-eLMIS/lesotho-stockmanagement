@@ -35,12 +35,12 @@ public class PointOfDeliveryService {
   /**
    * Get a list of Point of Delivery events.
    *
-   * @param facilityId facility id.
+   * @param destinationId destination id.
    * @return a list of pod events.
    */
-  public List<PointOfDeliveryEventDto> getPointOfDeliveryEventsByFacilityId(UUID facilityId) {
+  public List<PointOfDeliveryEventDto> getPointOfDeliveryEventsByDestinationId(UUID destinationId) {
     List<PointOfDeliveryEvent> pointOfDeliveryEvents =  pointOfDeliveryEventsRepository
-        .findByFacilityId(facilityId);
+        .findByDestinationId(destinationId);
     
     if (pointOfDeliveryEvents == null) {
       return Collections.emptyList();

@@ -23,5 +23,5 @@ import org.springframework.data.repository.query.Param;
 
 public interface PointOfDeliveryEventsRepository extends
         PagingAndSortingRepository<PointOfDeliveryEvent, UUID> {
-  List<PointOfDeliveryEvent> findByFacilityId(@Param("destinationId") UUID facilityId);
+  List<PointOfDeliveryEvent> findByDestinationId(@Param("destinationId") UUID destinationId);
 }
