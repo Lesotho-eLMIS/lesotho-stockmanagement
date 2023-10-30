@@ -40,6 +40,8 @@ import org.openlmis.stockmanagement.util.PointOfDeliveryEventProcessContext;
 @Builder
 public class PointOfDeliveryEventDto {
 
+  private UUID id;
+
   private UUID sourceId;
   private String sourceFreeText;
 
@@ -91,8 +93,15 @@ public class PointOfDeliveryEventDto {
     return podDtos;
   }
 
-  private static PointOfDeliveryEventDto podToDto(PointOfDeliveryEvent pointOfDeliveryEvent) {
+  /**
+   * Create from jpa model.
+   *
+   * @param pointOfDeliveryEvent inventory jpa model.
+   * @return created dto.
+   */
+  public static PointOfDeliveryEventDto podToDto(PointOfDeliveryEvent pointOfDeliveryEvent) {
     return PointOfDeliveryEventDto.builder()
+      .id(pointOfDeliveryEvent.getId())
       .sourceId(pointOfDeliveryEvent.getSourceId())
       .sourceFreeText(pointOfDeliveryEvent.getSourceFreeText())
       .destinationId(pointOfDeliveryEvent.getDestinationId())

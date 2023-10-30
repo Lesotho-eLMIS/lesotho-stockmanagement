@@ -36,9 +36,13 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Controller used to create point of delivery event.
@@ -46,6 +50,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/api/podEvents")
 public class PointOfDeliveryController extends BaseController {
+  public static final String ID_PATH_VARIABLE = "/{id}";
   private static final Logger LOGGER = LoggerFactory.getLogger(PointOfDeliveryController.class);
 
   //   @Autowired
@@ -110,6 +115,24 @@ public class PointOfDeliveryController extends BaseController {
     // ResponseEntity<UUID> response = new ResponseEntity<>(createdPodId, CREATED);
 
     //return stopProfiler(profiler, response);
+  }
+
+  /**
+   * Update a POD event.
+   *
+   * @param id POD event id.
+   * @param dto POD dto.
+   * @return created POD dto.
+   */
+  @Transactional
+  @PutMapping(ID_PATH_VARIABLE)
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<PointOfDeliveryEventDto> updatePointOfDeliveryEvent(@PathVariable UUID id,
+                                                    @RequestBody PointOfDeliveryEventDto dto) {
+    PointOfDeliveryEventDto updatedPodEvent = pointOfDeliveryService
+        .updatePointOfDeliveryEvent(dto, id);
+    return new ResponseEntity<>(updatedPodEvent, OK);
   }
 
 }

@@ -300,7 +300,7 @@ traits:
 
       get:
         is: [ secured ]
-        description: Get point of delivery event
+        description: Get a list of point of delivery events
         queryParameters:
           destinationId:
             required: true
@@ -327,6 +327,40 @@ traits:
               application/json:
                   schema: localizedMessage
             description: Provided query parameters are not correctly formatted.
+      
+      /{id}:
+        uriParameters:
+          id:
+            displayName: id
+            type: string
+            required: true
+            repeat: false
+        put:
+            is: [ secured ]
+            description: Update point of delivery event.
+            body:
+              application/json:
+                schema: pointOfDeliveryEventDto
+
+            responses:
+              200:
+                description: Point of delivery event updated.
+                headers:
+                  Keep-Alive:
+                body:
+                  application/json:
+                    schema: pointOfDeliveryEventDto
+              400:
+                body:
+                  application/json:
+                      schema: localizedMessage
+                description: An error occured during request processing.
+
+              403:
+                description: User does not have permission to save a point of delivery event.
+                body:
+                  application/json:
+                      schema: localizedMessage
 
   /stockCardSummaries:
       get:
