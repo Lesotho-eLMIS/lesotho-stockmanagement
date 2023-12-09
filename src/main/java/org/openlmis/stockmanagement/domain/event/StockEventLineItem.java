@@ -82,6 +82,10 @@ public class StockEventLineItem extends BaseEntity
   private String invoiceNumber;
   private Double unitPrice;
 
+  private Integer quantityRejected;
+  private UUID rejectionReasonId;
+  private String rejectionReasonFreeText;
+
   @OneToMany(
       cascade = ALL,
       fetch = FetchType.EAGER,
