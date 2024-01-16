@@ -86,6 +86,9 @@ public class StockEventLineItem extends BaseEntity
   private UUID rejectionReasonId;
   private String rejectionReasonFreeText;
 
+  private Integer quantityShipped;
+  private Integer quantityOnDeliveryNote;
+
   @OneToMany(
       cascade = ALL,
       fetch = FetchType.EAGER,

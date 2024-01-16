@@ -58,6 +58,9 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
   private UUID rejectionReasonId;
   private String rejectionReasonFreeText;
 
+  private Integer quantityShipped;
+  private Integer quantityOnDeliveryNote;
+
   private List<StockEventAdjustmentDto> stockAdjustments;
   
 
@@ -67,7 +70,8 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
         orderableId, lotId, quantity, extraData, occurredDate, reasonId, reasonFreeText, sourceId,
         sourceFreeText, destinationId, destinationFreeText, null, 
         referenceNumber, invoiceNumber, unitPrice, quantityRejected, 
-        rejectionReasonId, rejectionReasonFreeText, stockAdjustments()
+        rejectionReasonId, rejectionReasonFreeText, quantityShipped, 
+        quantityOnDeliveryNote, stockAdjustments()
     );
   }
 
