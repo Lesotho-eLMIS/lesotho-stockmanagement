@@ -20,6 +20,7 @@ import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +33,7 @@ import org.openlmis.stockmanagement.domain.common.VvmApplicable;
 import org.openlmis.stockmanagement.domain.event.StockEventLineItem;
 import org.openlmis.stockmanagement.domain.identity.IdentifiableByOrderableLot;
 import org.openlmis.stockmanagement.domain.physicalinventory.PhysicalInventoryLineItemAdjustment;
+import org.openlmis.stockmanagement.domain.qualitychecks.Discrepancy;
 
 @Setter
 @Getter
@@ -53,26 +55,30 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
   private String referenceNumber;
   private String invoiceNumber;
   private Double unitPrice;
-
   private Integer quantityRejected;
   private UUID rejectionReasonId;
   private String rejectionReasonFreeText;
 
   private Integer quantityShipped;
   private Integer quantityOnDeliveryNote;
-
   private List<StockEventAdjustmentDto> stockAdjustments;
+  private List<DiscrepancyDto> discrepancies;
   
 
   StockEventLineItem toEventLineItem() {
+
+    // List<Discrepancy> discrepanciesList = new ArrayList<>();
+    // for (DiscrepancyDto discrepancydto : discrepancies) {
+    //   discrepanciesList.add(discrepancydto.toDiscrepancy());
+    // }
+
     // event is set in StockEventDto.toEvent()
     return new StockEventLineItem(
         orderableId, lotId, quantity, extraData, occurredDate, reasonId, reasonFreeText, sourceId,
         sourceFreeText, destinationId, destinationFreeText, null, 
         referenceNumber, invoiceNumber, unitPrice, quantityRejected, 
         rejectionReasonId, rejectionReasonFreeText, quantityShipped, 
-        quantityOnDeliveryNote, stockAdjustments()
-    );
+        quantityOnDeliveryNote, stockAdjustments(),discrepancies());
   }
 
   public boolean hasReasonId() {
@@ -115,5 +121,20 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
         .stream()
         .map(StockEventAdjustmentDto::toPhysicalInventoryLineItemAdjustment)
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Gets discrepancies as {@link Discrepancy}.
+   */
+  public List<Discrepancy> discrepancies() {
+    if (null == discrepancies) {
+      return emptyList();
+    }
+
+    List<Discrepancy> discrepanciesList = new ArrayList<>();
+    for (DiscrepancyDto discrepancydto : discrepancies) {
+      discrepanciesList.add(discrepancydto.toDiscrepancy());
+    }
+    return discrepanciesList;
   }
 }

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ import org.openlmis.stockmanagement.domain.ExtraDataConverter;
 import org.openlmis.stockmanagement.domain.common.VvmApplicable;
 import org.openlmis.stockmanagement.domain.identity.IdentifiableByOrderableLot;
 import org.openlmis.stockmanagement.domain.physicalinventory.PhysicalInventoryLineItemAdjustment;
+import org.openlmis.stockmanagement.domain.qualitychecks.Discrepancy;
 
 @Data
 @Builder
@@ -95,6 +97,12 @@ public class StockEventLineItem extends BaseEntity
       orphanRemoval = true)
   @JoinColumn(name = "stockEventLineItemId")
   private List<PhysicalInventoryLineItemAdjustment> stockAdjustments;
+
+
+   // One-to-many relationship with Discrepancy
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @JoinColumn(name = "stock_event_line_item_id") // foreign key in Discrepancy table
+   private List<Discrepancy> discrepancies;
 
   /**
    * Returns clean copy of stock adjustments.
