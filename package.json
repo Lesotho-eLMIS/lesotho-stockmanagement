@@ -6,5 +6,16 @@
   },
   "scripts": {
     "runApiHtmlConverter": "raml2html --input ./build/resources/main/api-definition-raml.yaml --output ./build/resources/main/api-definition.html"
+  },
+  "dependencies": {
+    "command-line-args": "^5.2.1",
+    "deasync": "^0.1.29",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security",
+    "ip": "^2.0.1",
+    "raml-parser": "^0.8.18",
+    "system-sleep": "^1.3.7",
+    "util": "^0.12.5",
+    "uuid": "~3.0.0"
   }
 }

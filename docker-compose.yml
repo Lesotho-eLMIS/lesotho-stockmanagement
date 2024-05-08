@@ -3,17 +3,21 @@ services:
   stockmanagement:
     image: openlmis/stockmanagement
     links:
-      - db
-      - log
+      # - db
+      # - log
     ports:
       - "8080"
     env_file: .env
-  db:
-    image: openlmis/postgres:12-debezium
-    ports:
-      - "5432"
-    env_file: .env
-  log:
-    image: openlmis/rsyslog:1
-    volumes:
-      - '../logs/stockmanagement:/var/log'
+  # db:
+  #   image: openlmis/postgres:12-debezium
+  #   ports:
+  #     - "5432"
+  #   env_file: .env
+  # log:
+  #   image: openlmis/rsyslog:1
+  #   volumes:
+  #     - '../logs/stockmanagement:/var/log'
+networks:
+ default:
+  external:
+   name: lesotho-ref-distro_default
