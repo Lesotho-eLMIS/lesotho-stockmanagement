@@ -55,6 +55,7 @@ public class StockCardLineItemDataBuilder {
   private Integer stockOnHand = 0;
   private List<PhysicalInventoryLineItemAdjustment> stockAdjustments = Lists.newArrayList();
   private String referenceNumber = "REF-001";
+  private String cartonNumber = "CART-1";
   private String invoiceNumber = "INV-001";
   private Double unitPrice = 2.50;
 
@@ -157,8 +158,9 @@ public class StockCardLineItemDataBuilder {
   public StockCardLineItem build() {
     StockCardLineItem lineItem = new StockCardLineItem(
         stockCard, originEvent, quantity, extraData, reason, sourceFreeText, destinationFreeText,
-        documentNumber, reasonFreeText, signature, referenceNumber, invoiceNumber, unitPrice,
-        source, destination, occurredDate, processedDateTime, userId, stockOnHand, stockAdjustments
+        documentNumber, reasonFreeText, signature, referenceNumber, cartonNumber, invoiceNumber,
+        unitPrice, source, destination, occurredDate, processedDateTime, userId, stockOnHand,
+        stockAdjustments
     );
     lineItem.setId(id);
 

@@ -42,6 +42,7 @@ public class StockEventLineItemDtoDataBuilder {
   private UUID destinationId = UUID.randomUUID();
   private String destinationFreeText = RandomStringUtils.random(5);
   private String referenceNumber = RandomStringUtils.random(5);
+  private String cartonNumber = RandomStringUtils.random(5);
   private String invoiceNumber = RandomStringUtils.random(5);
   private Double unitPrice = 0.0;
   private Integer quantityRejected = 0;
@@ -69,8 +70,8 @@ public class StockEventLineItemDtoDataBuilder {
     noSourceAndDestination();
     return new StockEventLineItemDto(orderableId, lotId,quantity, extraData, occurredDate, reasonId,
         reasonFreeText, sourceId, sourceFreeText, destinationId, destinationFreeText,
-        referenceNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId, rejectionReasonFreeText, 
-        quantityShipped, quantityOnDeliveryNote, stockAdjustments, discrepancies);
+        referenceNumber, cartonNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId,
+        rejectionReasonFreeText, quantityShipped, quantityOnDeliveryNote, stockAdjustments, discrepancies);
   }
 
   /**
@@ -79,8 +80,8 @@ public class StockEventLineItemDtoDataBuilder {
   public StockEventLineItemDto build() {
     return new StockEventLineItemDto(orderableId, lotId,quantity, extraData, occurredDate, reasonId,
         reasonFreeText, sourceId, sourceFreeText, destinationId, destinationFreeText,
-        referenceNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId, rejectionReasonFreeText, 
-        quantityShipped, quantityOnDeliveryNote, stockAdjustments,discrepancies);
+        referenceNumber, cartonNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId,
+        rejectionReasonFreeText, quantityShipped, quantityOnDeliveryNote, stockAdjustments,discrepancies);
   }
 
   /**

@@ -53,6 +53,7 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
   private UUID destinationId;
   private String destinationFreeText;
   private String referenceNumber;
+  private String cartonNumber;
   private String invoiceNumber;
   private Double unitPrice;
   private Integer quantityRejected;
@@ -76,7 +77,7 @@ public class StockEventLineItemDto implements IdentifiableByOrderableLot, VvmApp
     return new StockEventLineItem(
         orderableId, lotId, quantity, extraData, occurredDate, reasonId, reasonFreeText, sourceId,
         sourceFreeText, destinationId, destinationFreeText, null, 
-        referenceNumber, invoiceNumber, unitPrice, quantityRejected, 
+        referenceNumber, cartonNumber, invoiceNumber, unitPrice, quantityRejected, 
         rejectionReasonId, rejectionReasonFreeText, quantityShipped, 
         quantityOnDeliveryNote, stockAdjustments(),discrepancies());
   }

@@ -81,6 +81,7 @@ public class StockEventLineItem extends BaseEntity
   private StockEvent stockEvent;
 
   private String referenceNumber;
+  private String cartonNumber;
   private String invoiceNumber;
   private Double unitPrice;
 

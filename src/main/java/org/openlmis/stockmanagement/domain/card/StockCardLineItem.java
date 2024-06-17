@@ -96,8 +96,10 @@ public class StockCardLineItem extends BaseEntity {
 
   //additional field required on stockcard
   private String referenceNumber;
+  private String cartonNumber;
   private String invoiceNumber;
   private Double unitPrice;
+
 
   @ManyToOne
   @JoinColumn
@@ -180,6 +182,7 @@ public class StockCardLineItem extends BaseEntity {
         .userId(eventDto.getContext().getCurrentUserId())
 
         .referenceNumber(eventLineItem.getReferenceNumber())
+        .cartonNumber(eventLineItem.getCartonNumber())
         .unitPrice(eventLineItem.getUnitPrice())
         .invoiceNumber(eventLineItem.getInvoiceNumber())
 
