@@ -36,13 +36,15 @@ public class ComplaintLineItemDto {
   private Integer quantityAffected;
   private Integer quantityReturned;
   private String natureOfComplaint;
+  private String complaintReason;
+  private String reasonDetails;
   private String comments;
   
 
   ComplaintLineItem toComplaintLineItem() {
     return new ComplaintLineItem(
         orderableId, lotId, quantityAffected, quantityReturned,
-        natureOfComplaint, comments, null);
+        natureOfComplaint, complaintReason, reasonDetails, comments, null);
   }
 
   public boolean hasLotId() {

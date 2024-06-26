@@ -227,6 +227,8 @@ public class ComplaintService {
       .quantityAffected(complaintLineItem.getQuantityAffected())
       .quantityReturned(complaintLineItem.getQuantityReturned())
       .natureOfComplaint(complaintLineItem.getNatureOfComplaint())
+      .complaintReason(complaintLineItem.getComplaintReason())
+      .reasonDetails(complaintLineItem.getReasonDetails())
       .comments(complaintLineItem.getComments())
       .build();
   }

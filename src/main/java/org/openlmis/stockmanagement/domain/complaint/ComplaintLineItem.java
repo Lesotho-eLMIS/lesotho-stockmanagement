@@ -49,6 +49,10 @@ public class ComplaintLineItem extends BaseEntity {
 
   private String natureOfComplaint;
 
+  private String complaintReason;
+
+  private String reasonDetails;
+
   private String comments;
 
   @ManyToOne()
