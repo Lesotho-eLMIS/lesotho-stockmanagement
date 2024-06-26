@@ -44,6 +44,12 @@ schemas:
            "items": { "type": "object", "$ref": "schemas/reason.json" }
        }
   - geographicZone: !include schemas/geographicZone.json
+  - complaintDto: !include schemas/complaintDto.json
+  - complaintDtos: |
+        {
+            "type": "array",
+            "items": {"type": "object", "$ref": "schemas/complaintDto.json"}
+        }
   - stockCardTemplate: !include schemas/stockCardTemplate.json
   - stockEventDto: !include schemas/stockEventDto.json
   - stockEventLineItemDto: !include schemas/stockEventLineItemDto.json
@@ -1173,3 +1179,113 @@ traits:
                 404:
                     body:
                       application/json:
+
+  /complaints:
+      get:
+        is: [ secured ]
+        description: Get a list of complaints
+        queryParameters:
+          facilityId:
+            required: true
+          
+        responses:
+          200:
+            description: |
+              Returns a default templte with all fields set to not display when no query parameters are passed.
+
+              Returns template that matches destination id.
+            headers:
+              X-Content-Type-Options:
+              X-XSS-Protection:
+            body:
+              application/json:
+                schema: complaintDtos
+          404:
+            description: Complaints not found for the given query parameter.
+            body:
+              application/json:
+                schema: localizedMessage
+          400:
+            body:
+              application/json:
+                  schema: localizedMessage
+            description: Provided query parameters are not correctly formatted.
+
+      post:
+        is: [ secured ]
+        description: Create a new complaint.
+        body:
+          application/json:
+            schema: complaintDto
+
+        responses:
+          201:
+            description: Complaint has been processed with no validation error or persistence error.
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: uuid
+
+          400:
+            description: Failed to process complaint due to validation error.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+          403:
+            description: User does not have permission to create complaints for given facility.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+      /{id}:
+        uriParameters:
+          id:
+            displayName: id
+            type: string
+            required: true
+            repeat: false
+        put:
+            is: [ secured ]
+            description: Update complaint.
+            body:
+              application/json:
+                schema: complaintDto
+
+            responses:
+              200:
+                description: Complaint updated.
+                headers:
+                  Keep-Alive:
+                body:
+                  application/json:
+                    schema: complaintDto
+              400:
+                body:
+                  application/json:
+                      schema: localizedMessage
+                description: An error occured during request processing.
+
+              403:
+                description: User does not have permission to save a complaint.
+                body:
+                  application/json:
+                      schema: localizedMessage
+        delete:
+          is: [ secured ]
+          description: Delete a Complaint.
+
+          responses:
+            204:
+              description: Complaint deleted.
+            400:
+              description: Complaint is not found.
+              body:
+                application/json:
+                    schema: localizedMessage
+            403:
+              description: User does not have permission to delete a Complaint.
+              body:
+                application/json:
+                    schema: localizedMessage            
