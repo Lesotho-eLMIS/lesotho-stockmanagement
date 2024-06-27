@@ -32,7 +32,6 @@ import org.openlmis.stockmanagement.dto.referencedata.RightDto;
 import org.openlmis.stockmanagement.dto.referencedata.UserDto;
 import org.openlmis.stockmanagement.exception.ResourceNotFoundException;
 import org.openlmis.stockmanagement.repository.ComplaintsRepository;
-import org.openlmis.stockmanagement.service.notification.NotificationService;
 import org.openlmis.stockmanagement.service.notifier.ComplaintNotifier;
 import org.openlmis.stockmanagement.service.referencedata.RightReferenceDataService;
 import org.openlmis.stockmanagement.service.referencedata.UserReferenceDataService;
