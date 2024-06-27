@@ -32,6 +32,7 @@ import org.openlmis.stockmanagement.dto.referencedata.RightDto;
 import org.openlmis.stockmanagement.dto.referencedata.UserDto;
 import org.openlmis.stockmanagement.exception.ResourceNotFoundException;
 import org.openlmis.stockmanagement.repository.ComplaintsRepository;
+import org.openlmis.stockmanagement.service.notification.NotificationService;
 import org.openlmis.stockmanagement.service.notifier.ComplaintNotifier;
 import org.openlmis.stockmanagement.service.referencedata.RightReferenceDataService;
 import org.openlmis.stockmanagement.service.referencedata.UserReferenceDataService;
@@ -152,6 +153,9 @@ public class ComplaintService {
     if (incomingComplaint.getProgramId() != null) {
       existingComplaint.setProgramId(incomingComplaint.getProgramId());
     }
+    if (incomingComplaint.getProgramId() != null) {
+      existingComplaint.setProgramId(incomingComplaint.getProgramId());
+    }
     if (incomingComplaint.getInvoiceNumber() != null) {
       existingComplaint.setInvoiceNumber(incomingComplaint.getInvoiceNumber());
     }
@@ -217,6 +221,7 @@ public class ComplaintService {
       .id(complaint.getId())
       .facilityId(complaint.getFacilityId())
       .programId(complaint.getProgramId())
+      .programId(complaint.getProgramId())
       .purchaseOrderNumber(complaint.getPurchaseOrderNumber())
       .invoiceNumber(complaint.getInvoiceNumber())
       .userId(complaint.getUserId())
@@ -251,6 +256,27 @@ public class ComplaintService {
       .build();
   }
 
+  /**
+   * Send a Complaint as a notification.
+   *
+   * @param id Commplaint id.
+   */
+  public void sendComplaint(UUID id) {
+    Optional<Complaint> optionalComplaint =  complaintsRepository.findById(id);
+    if (optionalComplaint.isPresent()) {
+      Complaint complaint = optionalComplaint.get();
+      RightDto right = rightReferenceDataService.findRight("STOCK_INVENTORIES_EDIT");
+      if (right != null) {
+        complaintNotifier.notifyRecipients(complaint, right.getId());
+      }
+      
+      //Notify NDSO
+      List<UserDto> supplierUsers = userReferenceDataService.findUsers("ndso");
+      if (supplierUsers != null) {
+        complaintNotifier.notifyRecipients(complaint, supplierUsers);
+      } 
+    }
+  }
   /**
    * Send a Complaint as a notification.
    *
