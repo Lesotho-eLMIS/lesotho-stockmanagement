@@ -38,8 +38,10 @@ public class Complaint extends BaseEntity {
 
   @Column(nullable = false)
   private UUID facilityId;
-  
 
+  @Column(nullable = false)
+  private UUID programId;
+  
   @Column(nullable = false)
   private UUID userId;
 

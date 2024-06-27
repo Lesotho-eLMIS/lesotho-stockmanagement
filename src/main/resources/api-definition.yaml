@@ -1239,6 +1239,41 @@ traits:
               application/json:
                   schema: localizedMessage
 
+      /{id}/send:
+          uriParameters:
+              id:
+                  displayName: complaint Id
+                  type: string
+                  required: true
+                  repeat: false
+          post:
+              is: [ secured ]
+              description: Send complaint
+              responses:
+                  "200":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                            schema: complaintDto
+                  "400":
+                      body:
+                        application/json:
+                            schema: localizedMessage
+                  "404":
+                  "403":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                            schema: localizedMessage
+                  "409":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                            schema: localizedMessage
+
       /{id}:
         uriParameters:
           id:
@@ -1272,6 +1307,7 @@ traits:
                 body:
                   application/json:
                       schema: localizedMessage
+                      
         delete:
           is: [ secured ]
           description: Delete a Complaint.

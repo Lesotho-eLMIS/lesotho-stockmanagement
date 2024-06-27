@@ -19,6 +19,7 @@ import java.util.UUID;
 import lombok.Setter;
 
 import org.openlmis.stockmanagement.dto.referencedata.FacilityDto;
+import org.openlmis.stockmanagement.dto.referencedata.ProgramDto;
 
 
 /**
@@ -33,6 +34,7 @@ public class ComplaintProcessContext {
   private LazyResource<UUID> currentUserId;
   private LazyResource<String> currentUserNames;
   private LazyResource<FacilityDto> facility;
+  private LazyResource<ProgramDto> program;
 
   public UUID getCurrentUserId() {
     return currentUserId.get();
@@ -44,5 +46,9 @@ public class ComplaintProcessContext {
 
   public FacilityDto getFacility() {
     return facility.get();
+  }
+
+  public ProgramDto getProgram() {
+    return program.get();
   }
 }

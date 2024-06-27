@@ -25,7 +25,9 @@ import lombok.NoArgsConstructor;
 
 import org.openlmis.stockmanagement.dto.ComplaintDto;
 import org.openlmis.stockmanagement.dto.referencedata.FacilityDto;
+import org.openlmis.stockmanagement.dto.referencedata.ProgramDto;
 import org.openlmis.stockmanagement.service.referencedata.FacilityReferenceDataService;
+import org.openlmis.stockmanagement.service.referencedata.ProgramReferenceDataService;
 import org.openlmis.stockmanagement.util.AuthenticationHelper;
 import org.openlmis.stockmanagement.util.ComplaintProcessContext;
 import org.openlmis.stockmanagement.util.LazyResource;
@@ -59,6 +61,9 @@ public class ComplaintProcessContextBuilder {
   
   @Autowired
   private FacilityReferenceDataService facilityService;
+
+  @Autowired
+  private ProgramReferenceDataService programService;
   
   /**
    * Before processing events, put all needed ref data into context so
@@ -98,6 +103,14 @@ public class ComplaintProcessContextBuilder {
 
     LazyResource<String> userNames = new LazyResource<>(userNamesSupplier);
     context.setCurrentUserNames(userNames);
+
+    profiler.start("CREATE_LAZY_PROGRAM");
+    UUID programId = complaintDto.getProgramId();
+    Supplier<ProgramDto> programSupplier = new ReferenceDataSupplier<>(
+        programService, programId
+    );
+    LazyResource<ProgramDto> program = new LazyResource<>(programSupplier);
+    context.setProgram(program);
 
     profiler.start("CREATE_LAZY_FACILITY");
     UUID facilityId = complaintDto.getFacilityId();

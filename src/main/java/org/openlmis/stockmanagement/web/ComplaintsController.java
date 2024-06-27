@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -126,9 +127,9 @@ public class ComplaintsController extends BaseController {
   /**
    * Update a Complaint.
    *
-   * @param id POD event id.
-   * @param dto POD dto.
-   * @return created POD dto.
+   * @param id Complaint id.
+   * @param dto Complaint dto.
+   * @return created Complaint dto.
    */
   @Transactional
   @PutMapping(ID_PATH_VARIABLE)
@@ -139,6 +140,21 @@ public class ComplaintsController extends BaseController {
     ComplaintDto updatedPodEvent = complaintService
         .updateComplaint(dto, id);
     return new ResponseEntity<>(updatedPodEvent, OK);
+  }
+
+  /**
+   * Send a Complaint as a notification.
+   *
+   * @param id Commplaint id.
+   * @return sent Complaint dto.
+   */
+  
+  @PostMapping("/{id}/send")
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<ComplaintDto> sendComplaint(@PathVariable UUID id) {
+    complaintService.sendComplaint(id);
+    return new ResponseEntity<>(null, OK);
   }
 
   /**
