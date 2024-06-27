@@ -130,12 +130,10 @@ public class ComplaintNotifier extends BaseNotifier {
     profiler.start("NOTIFY_RECIPIENTS");
     for (UserDto recipient : recipients) {
       // if (complaint.getFacilityId().equals(recipient.getHomeFacilityId()) || isSupervisingUser(recipient)) {
-      if (isSupervisingUser(recipient)) {
-        valuesMap.put("username", recipient.getUsername());
-        XLOGGER.debug("Recipient username = {}", recipient.getUsername());
-        notificationService.notify(recipient,
-            sub.replace(params.getMessageSubject()), sub.replace(params.getMessageContent()));
-      }
+      valuesMap.put("username", recipient.getUsername());
+      XLOGGER.debug("Recipient username = {}", recipient.getUsername());
+      notificationService.notify(recipient,
+          sub.replace(params.getMessageSubject()), sub.replace(params.getMessageContent()));
     }
 
     profiler.stop().log();
