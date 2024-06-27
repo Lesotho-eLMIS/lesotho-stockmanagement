@@ -35,6 +35,10 @@ public abstract class MessageKeys {
       SERVICE_PREFIX + ".email.nearExpiry.subject";
   public static final String NOTIFICATION_NEAR_EXPIRY_CONTENT =
       SERVICE_PREFIX + ".email.nearExpiry.content";
+  public static final String NOTIFICATION_COMPLAINT_SUBJECT =
+      SERVICE_PREFIX + ".email.complaint.subject";
+  public static final String NOTIFICATION_COMPLAINT_CONTENT =
+      SERVICE_PREFIX + ".email.complaint.content";
   //server errors
   public static final String SERVER_ERROR_SHALLOW_COPY
       = SERVICE_PREFIX + ".error.shallowCopy";

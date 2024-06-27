@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "description": "Complaint",
+  "properties": {
+    "facilityId": {
+      "type": "string",
+      "description": "Facility id where the complaint originated from"
+    },
+    "referenceNumber": {
+      "type": "string",
+      "description": "Reference number of the consignment/shipment."
+    },
+    "packingDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The date when this event occurred"
+    },
+    "packedBy": {
+      "type": "string",
+      "format": "date",
+      "description": "Person who packed consignment"
+    },
+    "numberOfCartons": {
+      "type": "integer",
+      "description": "Indicates quantity of cartons. Not allowed to be negative"
+    },
+    "numberOfContainers": {
+      "type": "integer",
+      "description": "Indicates quantity of containers. Not allowed to be negative"
+    },
+    "remarks": {
+      "type": "string",
+      "description": "Remarks for complaint."
+    }
+  },
+  "required": ["facilityId"]
+}
