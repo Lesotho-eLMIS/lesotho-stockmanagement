@@ -39,6 +39,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @SuppressWarnings("PMD.TooManyMethods")
 public class PermissionService {
 
+  public static final String LOTS_MANAGE = "LOTS_MANAGE";
   public static final String STOCK_CARD_TEMPLATES_MANAGE = "STOCK_CARD_TEMPLATES_MANAGE";
   public static final String STOCK_ORGANIZATIONS_MANAGE = "STOCK_ORGANIZATIONS_MANAGE";
   public static final String REASONS_MANAGE = "STOCK_CARD_LINE_ITEM_REASONS_MANAGE";

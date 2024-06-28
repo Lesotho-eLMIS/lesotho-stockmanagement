@@ -15,36 +15,30 @@
 
 package org.openlmis.stockmanagement.service.notifier;
 
-import static org.openlmis.stockmanagement.service.PermissionService.STOCK_INVENTORIES_EDIT;
+import static org.openlmis.stockmanagement.i18n.MessageKeys.NOTIFICATION_STOCK_COUNT_CONTENT;
+import static org.openlmis.stockmanagement.i18n.MessageKeys.NOTIFICATION_STOCK_COUNT_SUBJECT;
+import static org.openlmis.stockmanagement.service.PermissionService.LOTS_MANAGE;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.openlmis.stockmanagement.dto.referencedata.FacilityDto;
+
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.openlmis.stockmanagement.dto.referencedata.RightDto;
 import org.openlmis.stockmanagement.dto.referencedata.UserDto;
+import org.openlmis.stockmanagement.i18n.MessageService;
 import org.openlmis.stockmanagement.service.notification.NotificationService;
-import org.openlmis.stockmanagement.service.referencedata.FacilityReferenceDataService;
 import org.openlmis.stockmanagement.service.referencedata.RightReferenceDataService;
 import org.openlmis.stockmanagement.service.referencedata.UserReferenceDataService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.ext.XLogger;
-import org.slf4j.ext.XLoggerFactory;
-import org.slf4j.profiler.Profiler;
+import org.openlmis.stockmanagement.util.Message;
+import org.openlmis.stockmanagement.util.RequestParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PhysicalInventoryNotifier {
-
-    private static final XLogger XLOGGER = XLoggerFactory.getXLogger(PhysicalInventoryNotifier.class);
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private FacilityReferenceDataService facilityReferenceDataService;
 
     @Autowired
     UserReferenceDataService userReferenceDataService;
@@ -53,57 +47,145 @@ public class PhysicalInventoryNotifier {
     RightReferenceDataService rightReferenceDataService;
 
     @Autowired
+    private MessageService messageService;
+
+    @Autowired
     private NotificationService notificationService;
 
+    private static final String ZONE_ID = "${time.zoneId}";
+
     /**
-     * notify flo.
+     * notify users with LOTS_MANAGE right.
      */
-    @Scheduled(cron = "${stockmanagement.monthBeforeApril.cron}", zone = "${time.zoneId}")
+    @Scheduled(cron = "${stockmanagement.monthBeforeApril.cron}", zone = ZONE_ID)
+    public void notifyMonthBeforeApril() {
+        notifyMonthBefore();
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    @Scheduled(cron = "${stockmanagement.monthBeforeSeptember.cron}", zone = ZONE_ID)
+    public void notifyMonthBeforeSeptember() {
+        notifyMonthBefore();
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
     public void notifyMonthBefore() {
-        logger.error("Fetching right");
-        RightDto right = rightReferenceDataService.findRight(STOCK_INVENTORIES_EDIT);
+        RightDto right = rightReferenceDataService.findRight(LOTS_MANAGE);
         UUID rightId = right.getId();
-        logger.error("Right Id" + rightId.toString());
-        Profiler profiler = new Profiler("NOTIFY_STOCK_EDITORS");
-        profiler.setLogger(XLOGGER);
-
-        profiler.start("GET_EDITORS");
-        Collection<UserDto> recipients = getReceipients(rightId);
-
-        profiler.start("NOTIFY_RECIPIENTS");
-        for (UserDto recipient : recipients) {
-            XLOGGER.error(recipient.getEmail());
-            notificationService.notify(recipient, "Subject", "Message content here");
+        Collection<UserDto> users = getReceipients();
+        for (UserDto user : users) {
+            System.out.println("----------------------------------");
+            System.out.println(userReferenceDataService.hasRight(user.getId(), rightId, null, null, null).getResult());
+            if (userReferenceDataService.hasRight(user.getId(), rightId, null, null, null).getResult().booleanValue()) {
+                Map<String, String> valuesMap = constructSubstitutionMap(user.getUsername(), " next month");
+                StrSubstitutor sub = new StrSubstitutor(valuesMap);
+                System.out.println("Sending notification to: " + user.getUsername());
+                notificationService.notify(user, getMessage(NOTIFICATION_STOCK_COUNT_SUBJECT),
+                        sub.replace(getMessage(NOTIFICATION_STOCK_COUNT_CONTENT)));
+            } else {
+                System.out.println("User " + user.getUsername() + " Cannot receive notifications");
+            }
         }
-
-        // find all facilities of type hospital or health center
-        // Collection<FacilityDto> hospitals = getFacilities("hospital");
-        // Collection<FacilityDto> healthCenters = getFacilities("health_center");
-
-        // Collection<FacilityDto> allFacilities = new ArrayList<>(hospitals);
-        // allFacilities.addAll(healthCenters);
-
-        // for (FacilityDto facility : healthCenters) {
-        // XLOGGER.debug(facility.toString());
-        // XLOGGER.error(facility.toString());
-        // XLOGGER.debug("Facility = {} ", facility.getName());
-        // XLOGGER.error("Facility = {} ", facility.getName());
-        // }
-        // foreach facility, find users with Stock_Inventory_Edit right
-        // send notification
     }
 
-    private Collection<UserDto> getReceipients(UUID rightId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("rightId", rightId.toString());
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    @Scheduled(cron = "${stockmanagement.twoWeeksBeforeApril.cron}", zone = ZONE_ID)
+    public void notifyTwoWeeksBeforeApril() {
+        notifyTwoWeeksBefore();
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    @Scheduled(cron = "${stockmanagement.twoWeeksBeforeSeptember.cron}", zone = ZONE_ID)
+    public void notifyTwoWeeksBeforeSeptember() {
+        notifyTwoWeeksBefore();
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    public void notifyTwoWeeksBefore() {
+        RightDto right = rightReferenceDataService.findRight(LOTS_MANAGE);
+        UUID rightId = right.getId();
+        Collection<UserDto> users = getReceipients();
+        for (UserDto user : users) {
+            System.out.println("----------------------------------");
+            System.out.println(userReferenceDataService.hasRight(user.getId(), rightId, null, null, null).getResult());
+            if (userReferenceDataService.hasRight(user.getId(), rightId, null, null, null).getResult().booleanValue()) {
+                Map<String, String> valuesMap = constructSubstitutionMap(user.getUsername(), "in two weeks time");
+                StrSubstitutor sub = new StrSubstitutor(valuesMap);
+                System.out.println("Sending notification to: " + user.getUsername());
+                notificationService.notify(user, getMessage(NOTIFICATION_STOCK_COUNT_SUBJECT),
+                        sub.replace(getMessage(NOTIFICATION_STOCK_COUNT_CONTENT)));
+            } else {
+                System.out.println("User " + user.getUsername() + " Cannot receive notifications");
+            }
+        }
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    @Scheduled(cron = "${stockmanagement.firstDayApril.cron}", zone = ZONE_ID)
+    public void notifyFirstDayOfApril() {
+        notifyFirstDay();
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    @Scheduled(cron = "${stockmanagement.firstDaySeptember.cron}", zone = ZONE_ID)
+    public void notifyFirstDayOfSeptember() {
+        notifyFirstDay();
+    }
+
+    /**
+     * notify users with LOTS_MANAGE right.
+     */
+    public void notifyFirstDay() {
+        RightDto right = rightReferenceDataService.findRight(LOTS_MANAGE);
+        UUID rightId = right.getId();
+        Collection<UserDto> users = getReceipients();
+        for (UserDto user : users) {
+            System.out.println("----------------------------------");
+            System.out.println(userReferenceDataService.hasRight(user.getId(), rightId, null, null, null).getResult());
+            if (userReferenceDataService.hasRight(user.getId(), rightId, null, null, null).getResult().booleanValue()) {
+                Map<String, String> valuesMap = constructSubstitutionMap(user.getUsername(),
+                        "starting today until month end");
+                StrSubstitutor sub = new StrSubstitutor(valuesMap);
+                System.out.println("Sending notification to: " + user.getUsername());
+                notificationService.notify(user, getMessage(NOTIFICATION_STOCK_COUNT_SUBJECT),
+                        sub.replace(getMessage(NOTIFICATION_STOCK_COUNT_CONTENT)));
+            } else {
+                System.out.println("User " + user.getUsername() + " Cannot receive notifications");
+            }
+        }
+    }
+
+    private Collection<UserDto> getReceipients() {
+        RequestParameters parameters = RequestParameters.init()
+                .set("active", true);
         return userReferenceDataService
-                .findUsers(parameters);
+                .search(parameters);
     }
 
-    private Collection<FacilityDto> getFacilities(String facilityTypeCode) {
-        Map<UUID, FacilityDto> facilityMap = facilityReferenceDataService.findByType(facilityTypeCode);
-        Collection<FacilityDto> facilityCollection = facilityMap.values();
-        return facilityCollection;
+    Map<String, String> constructSubstitutionMap(String username, String startTime) {
+        Map<String, String> valuesMap = new HashMap<>();
+        valuesMap.put("username", username);
+        valuesMap.put("startTime", startTime);
+        return valuesMap;
     }
 
+    private String getMessage(String key) {
+        return messageService
+                .localize(new Message(key))
+                .getMessage();
+    }
 }

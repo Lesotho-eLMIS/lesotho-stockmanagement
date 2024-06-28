@@ -36,8 +36,8 @@ public abstract class MessageKeys {
   public static final String NOTIFICATION_NEAR_EXPIRY_CONTENT =
           SERVICE_PREFIX + ".email.nearExpiry.content";
       
-  public static final String NOTIFICATION_PHYSICAL_INVENTORY_REMINDER1_SUBJECT = SERVICE_PREFIX + ".email.physicalinventory1.subject";
-  public static final String NOTIFICATION_PHYSICAL_INVENTORY_REMINDER1_CONTENT = SERVICE_PREFIX + ".email.physicalinventory1.content";
+  public static final String NOTIFICATION_STOCK_COUNT_SUBJECT = SERVICE_PREFIX + ".email.stockcount.subject";
+  public static final String NOTIFICATION_STOCK_COUNT_CONTENT = SERVICE_PREFIX + ".email.stockcount.content";
   //server errors
   public static final String SERVER_ERROR_SHALLOW_COPY
       = SERVICE_PREFIX + ".error.shallowCopy";
