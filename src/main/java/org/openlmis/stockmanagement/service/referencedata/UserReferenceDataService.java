@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserReferenceDataService extends BaseReferenceDataService<UserDto> {
 
+  public static final String SEARCH = "search";
+
   @Override
   protected String getUrl() {
     return "/api/users/";
@@ -49,7 +51,20 @@ public class UserReferenceDataService extends BaseReferenceDataService<UserDto> 
   }
 
   public Collection<UserDto> findUsers(Map<String, Object> parameters) {
-    return findAll("search", parameters);
+    return findAll(SEARCH, parameters);
+  }
+
+  /**
+   * This method retrieves a list of users whose usernames match with given username.
+   *
+   * @param name the name of user.
+   * @return UserDtos containing user's data, or null if such user was not found.
+   */
+  public List<UserDto> findUsers(String name) {
+    Map<String, Object> payload = Collections.singletonMap("username", name);
+
+    Page<UserDto> users = getPage(SEARCH, Collections.emptyMap(), payload);
+    return users.getContent().isEmpty() ? null : users.getContent();
   }
 
   /**
