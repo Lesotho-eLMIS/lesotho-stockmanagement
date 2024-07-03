@@ -17,6 +17,7 @@ package org.openlmis.stockmanagement.service.referencedata;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -95,19 +96,22 @@ public class UserReferenceDataService extends BaseReferenceDataService<UserDto> 
 
     Page<UserDto> users = getPage("search", Collections.emptyMap(), payload);
     return users.getContent().isEmpty() ? null : users.getContent().get(0);
-  }  
+  }
 
   /**
    * Check if user has a right with certain criteria.
    *
    * @param user     id of user to check for right
    * @param right    right to check
-   * @param program  program to check (for supervision rights, can be {@code null})
-   * @param facility facility to check (for supervision rights, can be {@code null})
-   * @return {@link ResultDto} of true or false depending on if user has the right.
+   * @param program  program to check (for supervision rights, can be
+   *                 {@code null})
+   * @param facility facility to check (for supervision rights, can be
+   *                 {@code null})
+   * @return {@link ResultDto} of true or false depending on if user has the
+   *         right.
    */
   public ResultDto<Boolean> hasRight(UUID user, UUID right, UUID program, UUID facility,
-                                     UUID warehouse) {
+      UUID warehouse) {
     RequestParameters parameters = RequestParameters
         .init()
         .set("rightId", right)
@@ -121,4 +125,30 @@ public class UserReferenceDataService extends BaseReferenceDataService<UserDto> 
   public ServiceResponse<List<String>> getPermissionStrings(UUID user, String etag) {
     return tryFindAll(user + "/permissionStrings", String[].class, etag);
   }
+
+  /**
+   * Searches users by the given right ID, program ID, supervisory node ID and
+   * warehouse ID.
+   *
+   * @param right           (required) the right UUID
+   * @param program         (optional) the program UUID
+   * @param supervisoryNode (optional) the supervisory node UUID
+   * @param warehouse       (optional) the warehouse UUID
+   * @return the list of all matching users
+   */
+  public Collection<UserDto> findAllUsers(UUID right, UUID program,
+      UUID supervisoryNode, UUID warehouse) {
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("rightId", right);
+    paramMap.put("programId", program);
+    paramMap.put("supervisoryNodeId", supervisoryNode);
+    paramMap.put("warehouseId", warehouse);
+
+    return findAll("/rightSearch", paramMap);
+  }
+
+  public Collection<UserDto> search(RequestParameters parameters) {
+    return getPage(parameters).getContent();
+  }
+
 }

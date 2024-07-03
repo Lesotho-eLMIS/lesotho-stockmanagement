@@ -16,6 +16,7 @@
 package org.openlmis.stockmanagement.service.referencedata;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -42,7 +43,7 @@ public class FacilityReferenceDataService extends BaseReferenceDataService<Facil
   protected Class<FacilityDto[]> getArrayResultClass() {
     return FacilityDto[].class;
   }
-  
+
   /**
    * Finds facilities by their ids.
    *
@@ -54,12 +55,42 @@ public class FacilityReferenceDataService extends BaseReferenceDataService<Facil
         .init()
         .set("id", ids);
 
-    Page<FacilityDto> facilityDtos =  getPage(parameters);
+    Page<FacilityDto> facilityDtos = getPage(parameters);
     return facilityDtos.getContent().stream()
-            .collect(Collectors.toMap(FacilityDto::getId, Function.identity()));
+        .collect(Collectors.toMap(FacilityDto::getId, Function.identity()));
   }
 
   public boolean exists(UUID id) {
     return id != null && findOne(id) != null;
   }
+
+  /**
+   * Finds facilities by their ids.
+   *
+   * @param facilityTypeCode code to look for.
+   * @return all facilities
+   */
+  public Collection<FacilityDto> findByFacilityTypeCode(String facilityTypeCode) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("type", facilityTypeCode);
+
+    return findAll("", parameters);
+  }
+
+  /**
+   * Finds facilities by their ids.
+   *
+   * @param type type to look for.
+   * @return map of ids and facilities
+   */
+  public Map<UUID, FacilityDto> findByType(String type) {
+    RequestParameters parameters = RequestParameters
+        .init()
+        .set("type", type);
+
+    Page<FacilityDto> facilityDtos = getPage(parameters);
+    return facilityDtos.getContent().stream()
+        .collect(Collectors.toMap(FacilityDto::getId, Function.identity()));
+  }
+
 }
