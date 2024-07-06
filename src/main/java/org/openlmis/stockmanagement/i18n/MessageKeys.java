@@ -34,13 +34,19 @@ public abstract class MessageKeys {
   public static final String NOTIFICATION_NEAR_EXPIRY_SUBJECT =
       SERVICE_PREFIX + ".email.nearExpiry.subject";
   public static final String NOTIFICATION_NEAR_EXPIRY_CONTENT =
-        SERVICE_PREFIX + ".email.nearExpiry.content";
-  public static final String NOTIFICATION_STOCK_COUNT_SUBJECT = SERVICE_PREFIX + ".email.stockcount.subject";
-  public static final String NOTIFICATION_STOCK_COUNT_CONTENT = SERVICE_PREFIX + ".email.stockcount.content";
+      SERVICE_PREFIX + ".email.nearExpiry.content";
+  public static final String NOTIFICATION_STOCK_COUNT_SUBJECT = 
+      SERVICE_PREFIX + ".email.stockcount.subject";
+  public static final String NOTIFICATION_STOCK_COUNT_CONTENT = 
+      SERVICE_PREFIX + ".email.stockcount.content";
   public static final String NOTIFICATION_COMPLAINT_SUBJECT =
       SERVICE_PREFIX + ".email.complaint.subject";
   public static final String NOTIFICATION_COMPLAINT_CONTENT =
-      SERVICE_PREFIX + ".email.complaint.content";
+          SERVICE_PREFIX + ".email.complaint.content";
+  public static final String NOTIFICATION_ISSUE_SUBJECT = 
+      SERVICE_PREFIX + ".email.issue.subject";
+  public static final String NOTIFICATION_ISSUE_CONTENT = 
+      SERVICE_PREFIX + ".email.issue.content";
 
   //server errors
   public static final String SERVER_ERROR_SHALLOW_COPY

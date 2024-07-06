@@ -28,6 +28,7 @@ import org.openlmis.stockmanagement.dto.StockEventDto;
 import org.openlmis.stockmanagement.dto.StockEventLineItemDto;
 import org.openlmis.stockmanagement.dto.referencedata.RightDto;
 import org.openlmis.stockmanagement.service.notifier.HighStockNotifier;
+import org.openlmis.stockmanagement.service.notifier.IssueStockNotifier;
 import org.openlmis.stockmanagement.service.notifier.LowStockNotifier;
 import org.openlmis.stockmanagement.service.notifier.StockoutNotifier;
 import org.openlmis.stockmanagement.service.referencedata.RightReferenceDataService;
@@ -38,8 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
-* A service that helps the StockEventProcessor to determine notification.
-*/
+ * A service that helps the StockEventProcessor to determine notification.
+ */
 @Service
 public class StockEventNotificationProcessor {
 
@@ -61,12 +62,16 @@ public class StockEventNotificationProcessor {
   @Autowired
   private RightReferenceDataService rightReferenceDataService;
 
+  @Autowired
+  private IssueStockNotifier issueStockNotifier;
+
   /**
-  * From the stock event, check each line item's stock card and see if stock on hand has gone to
-  * zero. If so, send a notification to all of that stock card's editors.
-  * 
-  * @param eventDto the stock event to process
-  */
+   * From the stock event, check each line item's stock card and see if stock on
+   * hand has gone to
+   * zero. If so, send a notification to all of that stock card's editors.
+   * 
+   * @param eventDto the stock event to process
+   */
   public void callAllNotifications(StockEventDto eventDto) {
     RightDto right = rightReferenceDataService.findRight(STOCK_INVENTORIES_EDIT);
     eventDto
@@ -83,11 +88,16 @@ public class StockEventNotificationProcessor {
     profiler.start("COPY_STOCK_CARD");
     OrderableLotIdentity identity = OrderableLotIdentity.identityOf(eventLine);
     StockCard stockCard = event.getContext().findCard(identity);
-    
+
     // Check if stockCard is null
     if (stockCard == null) {
       XLOGGER.error("StockCard not found for identity: {}", identity);
       return;
+    }
+
+    if (eventLine.getDestinationId() != null) {
+      System.out.println("Issue stock to: " + eventLine.getDestinationId());
+      issueStockNotifier.notifyStockEditors(stockCard, rightId, eventLine);
     }
 
     int averageConsumption = (int) Math.ceil(averageConsumption(stockCard));
@@ -108,7 +118,7 @@ public class StockEventNotificationProcessor {
   private double averageConsumption(StockCard stockCard) {
     // Get the stock card aggregates for the past three months
     Map<UUID, StockCardAggregate> stockCardsMap = stockCardSummariesService.getGroupedStockCards(
-        stockCard.getProgramId(), 
+        stockCard.getProgramId(),
         stockCard.getFacilityId(),
         Collections.singleton(stockCard.getOrderableId()),
         LocalDate.now().minusMonths(3),
@@ -118,7 +128,7 @@ public class StockEventNotificationProcessor {
     StockCardAggregate aggregate = stockCardsMap.get(stockCard.getOrderableId());
 
     if (aggregate == null) {
-        return 0; // No data available for this stock card
+      return 0; // No data available for this stock card
     }
 
     // Get the total consumed amount
@@ -142,7 +152,7 @@ public class StockEventNotificationProcessor {
   private Integer aggregateStockOnHand(StockCard stockCard) {
     // Get the stock card aggregates for the past three months
     Map<UUID, StockCardAggregate> stockCardsMap = stockCardSummariesService.getGroupedStockCards(
-        stockCard.getProgramId(), 
+        stockCard.getProgramId(),
         stockCard.getFacilityId(),
         Collections.singleton(stockCard.getOrderableId()),
         LocalDate.now().minusMonths(3),
@@ -152,11 +162,10 @@ public class StockEventNotificationProcessor {
     StockCardAggregate aggregate = stockCardsMap.get(stockCard.getOrderableId());
 
     if (aggregate == null) {
-        return 0; // No data available for this stock card
+      return 0; // No data available for this stock card
     }
 
     return aggregate.getTotalStockOnHand();
   }
 
 }
- 
