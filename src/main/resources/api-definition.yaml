@@ -44,6 +44,12 @@ schemas:
            "items": { "type": "object", "$ref": "schemas/reason.json" }
        }
   - geographicZone: !include schemas/geographicZone.json
+  - complaintDto: !include schemas/complaintDto.json
+  - complaintDtos: |
+        {
+            "type": "array",
+            "items": {"type": "object", "$ref": "schemas/complaintDto.json"}
+        }
   - stockCardTemplate: !include schemas/stockCardTemplate.json
   - stockEventDto: !include schemas/stockEventDto.json
   - stockEventLineItemDto: !include schemas/stockEventLineItemDto.json
@@ -52,6 +58,7 @@ schemas:
   - stockCardPage: !include schemas/stockCard.json
   - stockCardSummariesPage: !include schemas/stockCardSummaryV2Page.json
   - stockCardSummaries: !include schemas/stockCardSummaries.json
+  - allStockCardSummaries: !include schemas/stockCardSummaries.json
   - stockCardReasonSummaryPage: !include schemas/stockCardRangeSummaryPage.json
   - validSourceDestination: !include schemas/validSourceDestination.json
   - validSourceDestinations: |
@@ -334,6 +341,65 @@ traits:
           type: string
         programId:
           required: true
+          description: Program id, indicates the program that the queries stock card summaries is under.
+          repeat: false
+          type: string
+        orderableId:
+          required: false
+          description: Orderable id, indicates the orderable that the queries stock card summaries is under, can specify multiple orderable ids.
+          repeat: true
+          type: string
+        asOfDate:
+          required: false
+          description: Stock Card data will be calculated as of given date.
+          repeat: false
+          type: string
+        nonEmptyOnly:
+          required: false
+          description: Flag defining whether only summaries with non empty set of canFulfillForMe should be returned. Defaults to false.
+          repeat: false
+          type: boolean
+        orderableCode:
+          required: false
+          description: Code of orderable
+          repeat: false
+          type: string
+        orderableName:
+          required: false
+          description: Name of orderable
+          repeat: false
+          type: string
+        lotCode:
+          required: false
+          description: Lot code of orderables which can fulfill stock card
+          repeat: false
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              schema: stockCardSummariesPage
+        400:
+          body:
+            application/json:
+              schema: localizedMessage
+        403:
+          description: User does not have permission to view stock cards of given facility and program.
+          body:
+            application/json:
+              schema: localizedMessage
+  /v2/allStockCardSummaries:
+    get:
+      is: [ secured, paginated ]
+      description: Get summaries of all available stock cards, which contains SOH, product name, and other essential information. This will NOT return any line items. (This could be used by front end for list view.)
+      queryParameters:
+        facilityId:
+          required: true
+          description: Facility id, indicates the facility that the queried stock card summaries should belong to.
+          repeat: false
+          type: string
+        programId:
+          required: false
           description: Program id, indicates the program that the queries stock card summaries is under.
           repeat: false
           type: string
@@ -1173,3 +1239,149 @@ traits:
                 404:
                     body:
                       application/json:
+
+  /complaints:
+      get:
+        is: [ secured ]
+        description: Get a list of complaints
+        queryParameters:
+          facilityId:
+            required: true
+          
+        responses:
+          200:
+            description: |
+              Returns a default templte with all fields set to not display when no query parameters are passed.
+
+              Returns template that matches destination id.
+            headers:
+              X-Content-Type-Options:
+              X-XSS-Protection:
+            body:
+              application/json:
+                schema: complaintDtos
+          404:
+            description: Complaints not found for the given query parameter.
+            body:
+              application/json:
+                schema: localizedMessage
+          400:
+            body:
+              application/json:
+                  schema: localizedMessage
+            description: Provided query parameters are not correctly formatted.
+
+      post:
+        is: [ secured ]
+        description: Create a new complaint.
+        body:
+          application/json:
+            schema: complaintDto
+
+        responses:
+          201:
+            description: Complaint has been processed with no validation error or persistence error.
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: uuid
+
+          400:
+            description: Failed to process complaint due to validation error.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+          403:
+            description: User does not have permission to create complaints for given facility.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+      /{id}/send:
+          uriParameters:
+              id:
+                  displayName: complaint Id
+                  type: string
+                  required: true
+                  repeat: false
+          post:
+              is: [ secured ]
+              description: Send complaint
+              responses:
+                  "200":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                            schema: complaintDto
+                  "400":
+                      body:
+                        application/json:
+                            schema: localizedMessage
+                  "404":
+                  "403":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                            schema: localizedMessage
+                  "409":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                            schema: localizedMessage
+
+      /{id}:
+        uriParameters:
+          id:
+            displayName: id
+            type: string
+            required: true
+            repeat: false
+        put:
+            is: [ secured ]
+            description: Update complaint.
+            body:
+              application/json:
+                schema: complaintDto
+
+            responses:
+              200:
+                description: Complaint updated.
+                headers:
+                  Keep-Alive:
+                body:
+                  application/json:
+                    schema: complaintDto
+              400:
+                body:
+                  application/json:
+                      schema: localizedMessage
+                description: An error occured during request processing.
+
+              403:
+                description: User does not have permission to save a complaint.
+                body:
+                  application/json:
+                      schema: localizedMessage
+                      
+        delete:
+          is: [ secured ]
+          description: Delete a Complaint.
+
+          responses:
+            204:
+              description: Complaint deleted.
+            400:
+              description: Complaint is not found.
+              body:
+                application/json:
+                    schema: localizedMessage
+            403:
+              description: User does not have permission to delete a Complaint.
+              body:
+                application/json:
+                    schema: localizedMessage            

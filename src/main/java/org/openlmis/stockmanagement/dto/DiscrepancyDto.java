@@ -13,33 +13,40 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.stockmanagement.service.referencedata;
 
-import java.util.Collection;
-import java.util.HashMap;
+package org.openlmis.stockmanagement.dto;
 
-import org.openlmis.stockmanagement.dto.referencedata.ProgramDto;
-import org.springframework.stereotype.Service;
+import java.util.UUID;
 
-@Service
-public class ProgramReferenceDataService extends BaseReferenceDataService<ProgramDto> {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.openlmis.stockmanagement.domain.qualitychecks.Discrepancy;
+import org.openlmis.stockmanagement.dto.requisition.RejectionReasonDto;
 
-  @Override
-  protected String getUrl() {
-    return "/api/programs/";
-  }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class DiscrepancyDto {
 
-  @Override
-  protected Class<ProgramDto> getResultClass() {
-    return ProgramDto.class;
-  }
+  private UUID id;
+  private RejectionReasonDto rejectionReason;
+  private Integer quantityAffected;
+  private String comments;
 
-  @Override
-  protected Class<ProgramDto[]> getArrayResultClass() {
-    return ProgramDto[].class;
-  }
+  /**
+   * Convert dto to jpa model.
+   *
+   * @return the converted jpa model object.
+   */
+  public Discrepancy toDiscrepancy() {
+    Discrepancy discrepancy = new Discrepancy(
+        rejectionReason.getId(),
+        quantityAffected,
+        comments);
 
-  public Collection<ProgramDto> getAllPrograms() {
-    return findAll("", new HashMap<>());
+    return discrepancy;
   }
 }

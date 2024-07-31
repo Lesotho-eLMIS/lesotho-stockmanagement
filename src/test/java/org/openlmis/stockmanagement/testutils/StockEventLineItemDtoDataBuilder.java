@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
+import org.openlmis.stockmanagement.dto.DiscrepancyDto;
 import org.openlmis.stockmanagement.dto.StockEventAdjustmentDto;
 import org.openlmis.stockmanagement.dto.StockEventLineItemDto;
+
 
 public class StockEventLineItemDtoDataBuilder {
 
@@ -40,6 +42,7 @@ public class StockEventLineItemDtoDataBuilder {
   private UUID destinationId = UUID.randomUUID();
   private String destinationFreeText = RandomStringUtils.random(5);
   private String referenceNumber = RandomStringUtils.random(5);
+  private String cartonNumber = RandomStringUtils.random(5);
   private String invoiceNumber = RandomStringUtils.random(5);
   private Double unitPrice = 0.0;
   private Integer quantityRejected = 0;
@@ -48,6 +51,7 @@ public class StockEventLineItemDtoDataBuilder {
   private Integer quantityShipped = 0;
   private Integer quantityOnDeliveryNote = 0;
   private List<StockEventAdjustmentDto> stockAdjustments = new ArrayList<>();
+  private List<DiscrepancyDto> discrepancies = new ArrayList<>();
 
   /**
    * Builds Physical Inventory Event.
@@ -66,8 +70,8 @@ public class StockEventLineItemDtoDataBuilder {
     noSourceAndDestination();
     return new StockEventLineItemDto(orderableId, lotId,quantity, extraData, occurredDate, reasonId,
         reasonFreeText, sourceId, sourceFreeText, destinationId, destinationFreeText,
-        referenceNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId, rejectionReasonFreeText, 
-        quantityShipped, quantityOnDeliveryNote, stockAdjustments);
+        referenceNumber, cartonNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId,
+        rejectionReasonFreeText, quantityShipped, quantityOnDeliveryNote, stockAdjustments, discrepancies);
   }
 
   /**
@@ -76,8 +80,8 @@ public class StockEventLineItemDtoDataBuilder {
   public StockEventLineItemDto build() {
     return new StockEventLineItemDto(orderableId, lotId,quantity, extraData, occurredDate, reasonId,
         reasonFreeText, sourceId, sourceFreeText, destinationId, destinationFreeText,
-        referenceNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId, rejectionReasonFreeText, 
-        quantityShipped, quantityOnDeliveryNote, stockAdjustments);
+        referenceNumber, cartonNumber, invoiceNumber, unitPrice, quantityRejected, rejectionReasonId,
+        rejectionReasonFreeText, quantityShipped, quantityOnDeliveryNote, stockAdjustments,discrepancies);
   }
 
   /**

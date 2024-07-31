@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.4.3.final using JasperReports Library version 6.4.3  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StockCardSummary" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="d0829c7a-bf73-4e6e-9b5a-1735ab6c4d7d">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -13,10 +13,6 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<import value="org.openlmis.stockmanagement.domain.card.*"/>
 	<import value="org.openlmis.stockmanagement.dto.*"/>
-	<import value="java.io.ByteArrayInputStream"/>
-	<import value="java.util.Base64"/>
-	<import value="java.awt.Image"/>
-	<import value="javax.imageio.ImageIO"/>
 	<import value="java.time.LocalDate"/>
 	<import value="java.time.format.DateTimeFormatter"/>
 	<import value="java.time.ZonedDateTime"/>
@@ -113,7 +109,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="124" splitType="Stretch">
+		<band height="136" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="20" width="595" height="50" uuid="ecab56ef-a62f-486f-bc7d-c1431467efc4"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -121,14 +117,14 @@
 				</textElement>
 				<text><![CDATA[Stock Card Summary]]></text>
 			</staticText>
+			<image>
+				<reportElement x="283" y="72" width="50" height="50" uuid="840aea5a-bb8e-4a51-8dc4-78cf844b72dc"/>
+				<imageExpression><![CDATA["logo.png"]]></imageExpression>
+			</image>
 			<staticText>
 				<reportElement x="130" y="82" width="100" height="30" uuid="8dbe3893-e856-415b-bbff-70291adfbf62"/>
 				<text><![CDATA[eLMIS]]></text>
 			</staticText>
-			<image>
-				<reportElement x="283" y="72" width="50" height="50" uuid="840aea5a-bb8e-4a51-8dc4-78cf844b72dc"/>
-                <imageExpression><![CDATA[new ByteArrayInputStream(org.apache.commons.codec.binary.Base64.decodeBase64("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".getBytes()))]]></imageExpression>
-            </image>
 			<staticText>
 				<reportElement x="410" y="80" width="100" height="30" uuid="88b9759c-e3b0-4094-9ae4-0cb1d5daf722"/>
 				<text><![CDATA[Ministry of Health]]></text>
@@ -150,7 +146,7 @@
 				</textElement>
 				<text><![CDATA[Facility:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
 				<reportElement x="90" y="0" width="74" height="30" uuid="68d8d341-d519-4cd5-adaf-845085a2b343"/>
 				<textElement>
 					<font size="8" isBold="false"/>
@@ -166,7 +162,7 @@
 				</textElement>
 				<text><![CDATA[Facility code:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
 				<reportElement x="230" y="0" width="74" height="30" uuid="e28722c1-aff1-4167-af88-1d9b88dc2c81"/>
 				<textElement>
 					<font size="8" isBold="false"/>
@@ -184,7 +180,7 @@
 				</textElement>
 				<text><![CDATA[Program:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="350" y="0" width="74" height="30" uuid="090f268a-9013-48d7-bf4c-2d082ce82426">
 					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
@@ -205,7 +201,7 @@
 				</textElement>
 				<text><![CDATA[Program Code:]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="493" y="0" width="74" height="30" uuid="1155efb4-d80b-4867-bc2c-4708e21299cb">
 					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
@@ -285,7 +281,7 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="93" height="30" uuid="b1604e69-79e0-4933-8ee5-51d6cce5061f"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -308,7 +304,7 @@
 						<jr:detailCell style="Table 1_TD" height="30">
 							<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="77" height="30" uuid="469bc4d2-785e-4ac7-81ab-df1bff6c2525"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -331,7 +327,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="67" height="30" uuid="624e834f-d046-4881-a936-88b40ef263bd"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -354,7 +350,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="50" height="30" uuid="9abf6368-8b9c-4cc1-9e71-69cb90044263"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -378,7 +374,7 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
-							<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="false">
 								<reportElement x="0" y="0" width="80" height="30" uuid="6680122f-b158-4277-afff-29f8eae11525"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -402,7 +398,7 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="73" height="30" uuid="32fea3a9-1db4-4e09-90d0-49c214525ec5"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -423,7 +419,7 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="102" height="30" uuid="e8a313ec-9db5-4892-9671-fc221c5e6abd"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -444,7 +440,7 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 1_TD" height="30">
-							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="65" height="30" uuid="6b7919e9-5946-4ae1-9417-412f5ddc1286"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>

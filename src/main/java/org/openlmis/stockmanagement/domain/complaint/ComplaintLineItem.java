@@ -13,48 +13,50 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.stockmanagement.domain.qualitychecks;
+package org.openlmis.stockmanagement.domain.complaint;
+//import org.openlmis.stockmanagement.dto.StockEventAdjustmentDto;
 
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.stockmanagement.domain.BaseEntity;
-import org.openlmis.stockmanagement.domain.event.StockEventLineItem;
 
- 
- 
-@Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "stock_event_line_item_discrepencies", schema = "stockmanagement")
-public class Discrepancy extends BaseEntity {
- 
-   private UUID rejectionReasonId;
-   private Integer quantityAffected;
-   private String comments;
- 
-   // Many-to-one relationship with StockEventLineItem
-   @ManyToOne
-   @JoinColumn(name = "stock_event_line_item_id")
-   private StockEventLineItem stockEventLineItem;
- 
-   /**
-    * Constructor for Discrepency.
-    *
-    */
-   public Discrepancy(UUID rejectionReasonId, 
-       Integer quantityAffected, String comments) {
-     this.rejectionReasonId = rejectionReasonId;
-     this.quantityAffected = quantityAffected;
-     this.comments = comments;
-     // stockEventLineItem can be set later or remain null
-   }
+@Entity
+@Table(name = "complaint_line_items", schema = "stockmanagement")
+public class ComplaintLineItem extends BaseEntity {
+
+  @Column(nullable = false)
+  private UUID orderableId;
+
+  private UUID lotId;
+
+  @Column(nullable = false)
+  private Integer quantityAffected;
+
+  @Column(nullable = false)
+  private Integer quantityReturned;
+
+  private String natureOfComplaint;
+
+  private String complaintReason;
+
+  private String reasonDetails;
+
+  private String comments;
+
+  @ManyToOne()
+  @JoinColumn(nullable = false)
+  private Complaint complaint;
+
 }
- 
- 

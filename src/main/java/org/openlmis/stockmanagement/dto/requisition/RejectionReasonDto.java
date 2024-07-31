@@ -13,33 +13,23 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.stockmanagement.service.referencedata;
+package org.openlmis.stockmanagement.dto.requisition;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.UUID;
 
-import org.openlmis.stockmanagement.dto.referencedata.ProgramDto;
-import org.springframework.stereotype.Service;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Service
-public class ProgramReferenceDataService extends BaseReferenceDataService<ProgramDto> {
-
-  @Override
-  protected String getUrl() {
-    return "/api/programs/";
-  }
-
-  @Override
-  protected Class<ProgramDto> getResultClass() {
-    return ProgramDto.class;
-  }
-
-  @Override
-  protected Class<ProgramDto[]> getArrayResultClass() {
-    return ProgramDto[].class;
-  }
-
-  public Collection<ProgramDto> getAllPrograms() {
-    return findAll("", new HashMap<>());
-  }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class RejectionReasonDto {
+  private UUID id;
+  private String name;
+  private String code;
+  private Boolean active;
+  private RejectionReasonCategoryDto rejectionReasonCategory;
 }

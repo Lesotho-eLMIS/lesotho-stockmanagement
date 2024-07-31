@@ -30,7 +30,7 @@ services:
     env_file: .env
   image:
     build: .
-    image: openlmis/stockmanagement
+    image: elmislesotho/stockmanagement
   db:
     image: openlmis/postgres:12-debezium
     env_file: .env

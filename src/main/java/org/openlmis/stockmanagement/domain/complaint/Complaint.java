@@ -13,48 +13,47 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.stockmanagement.domain.qualitychecks;
+package org.openlmis.stockmanagement.domain.complaint;
 
+import static javax.persistence.CascadeType.ALL;
+
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.stockmanagement.domain.BaseEntity;
-import org.openlmis.stockmanagement.domain.event.StockEventLineItem;
 
- 
- 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "stock_event_line_item_discrepencies", schema = "stockmanagement")
-public class Discrepancy extends BaseEntity {
- 
-   private UUID rejectionReasonId;
-   private Integer quantityAffected;
-   private String comments;
- 
-   // Many-to-one relationship with StockEventLineItem
-   @ManyToOne
-   @JoinColumn(name = "stock_event_line_item_id")
-   private StockEventLineItem stockEventLineItem;
- 
-   /**
-    * Constructor for Discrepency.
-    *
-    */
-   public Discrepancy(UUID rejectionReasonId, 
-       Integer quantityAffected, String comments) {
-     this.rejectionReasonId = rejectionReasonId;
-     this.quantityAffected = quantityAffected;
-     this.comments = comments;
-     // stockEventLineItem can be set later or remain null
-   }
+@NoArgsConstructor
+@Table(name = "complaints", schema = "stockmanagement")
+public class Complaint extends BaseEntity {
+
+  @Column(nullable = false)
+  private UUID facilityId;
+
+  @Column(nullable = false)
+  private UUID programId;
+  
+  @Column(nullable = false)
+  private UUID userId;
+
+  private String userNames;
+
+  @Column(nullable = false, columnDefinition = "timestamp")
+  private ZonedDateTime occurredDate;
+
+  private String invoiceNumber;
+
+  private String purchaseOrderNumber;
+
+  @OneToMany(cascade = ALL, mappedBy = "complaint")
+  private List<ComplaintLineItem> lineItems;
 }
- 
- 

@@ -62,8 +62,8 @@ import org.slf4j.LoggerFactory;
 @JsonIgnoreProperties({
     "stockCard", "originEvent",
     "source", "destination",
-    "processedDate",
-    "userId"})
+    "processedDate"/*,
+    "userId"*/})
 @Table(name = "stock_card_line_items", schema = "stockmanagement")
 public class StockCardLineItem extends BaseEntity {
 
@@ -96,8 +96,10 @@ public class StockCardLineItem extends BaseEntity {
 
   //additional field required on stockcard
   private String referenceNumber;
+  private String cartonNumber;
   private String invoiceNumber;
   private Double unitPrice;
+
 
   @ManyToOne
   @JoinColumn
@@ -180,6 +182,7 @@ public class StockCardLineItem extends BaseEntity {
         .userId(eventDto.getContext().getCurrentUserId())
 
         .referenceNumber(eventLineItem.getReferenceNumber())
+        .cartonNumber(eventLineItem.getCartonNumber())
         .unitPrice(eventLineItem.getUnitPrice())
         .invoiceNumber(eventLineItem.getInvoiceNumber())
 
