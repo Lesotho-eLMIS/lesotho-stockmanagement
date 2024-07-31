@@ -15,6 +15,9 @@
 
 package org.openlmis.stockmanagement.service.referencedata;
 
+import java.util.Collection;
+import java.util.HashMap;
+
 import org.openlmis.stockmanagement.dto.referencedata.ProgramDto;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +37,9 @@ public class ProgramReferenceDataService extends BaseReferenceDataService<Progra
   @Override
   protected Class<ProgramDto[]> getArrayResultClass() {
     return ProgramDto[].class;
+  }
+
+  public Collection<ProgramDto> getAllPrograms() {
+    return findAll("", new HashMap<>());
   }
 }
