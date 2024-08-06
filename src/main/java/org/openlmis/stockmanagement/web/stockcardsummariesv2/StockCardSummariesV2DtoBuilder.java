@@ -34,6 +34,9 @@ import org.openlmis.stockmanagement.dto.ObjectReferenceDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableFulfillDto;
 import org.openlmis.stockmanagement.dto.referencedata.VersionObjectReferenceDto;
+import org.openlmis.stockmanagement.service.referencedata.LotReferenceDataService;
+import org.openlmis.stockmanagement.service.referencedata.OrderableReferenceDataService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +46,12 @@ public class StockCardSummariesV2DtoBuilder {
   static final String ORDERABLES = "orderables";
   static final String STOCK_CARDS = "stockCards";
   static final String LOTS = "lots";
+
+  @Autowired
+  LotReferenceDataService lotReferenceDataService;
+
+  @Autowired
+  OrderableReferenceDataService orderableReferenceDataService;
 
   @Value("${service.url}")
   private String serviceUrl;
@@ -104,6 +113,17 @@ public class StockCardSummariesV2DtoBuilder {
 
   private CanFulfillForMeEntryDto createCanFulfillForMeEntry(StockCard stockCard, 
                                                               UUID orderableId) {
+
+    //resolve orderable & lot names -- this may cause merge conflicts - future updates from OpenLMIS
+    String orderableName = "";
+    String lotCode = "";
+    if (stockCard.getOrderableId() != null) {
+      orderableName = orderableReferenceDataService.findOne(stockCard.getOrderableId()).getFullProductName();
+    } 
+    if (stockCard.getLotId() != null) {
+      lotCode = lotReferenceDataService.findOne(stockCard.getLotId()).getLotCode();
+    }   
+
     return new CanFulfillForMeEntryDto(
         createStockCardReference(stockCard.getId()),
         createReference(orderableId, ORDERABLES),
@@ -111,7 +131,9 @@ public class StockCardSummariesV2DtoBuilder {
         stockCard.getStockOnHand(),
         stockCard.getOccurredDate(),
         stockCard.getProcessedDate(),
-        stockCard.isActive()
+        stockCard.isActive(),
+        orderableName,
+        lotCode
       );
   }
 

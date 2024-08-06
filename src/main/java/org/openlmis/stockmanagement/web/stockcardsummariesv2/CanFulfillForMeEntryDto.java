@@ -63,4 +63,12 @@ public final class CanFulfillForMeEntryDto {
   @Getter
   @Setter
   private boolean active;
+
+  @Getter
+  @Setter
+  private String orderableName;
+
+  @Getter
+  @Setter
+  private String lotCode;
 }
