@@ -71,4 +71,8 @@ public final class CanFulfillForMeEntryDto {
   @Getter
   @Setter
   private String lotCode;
+
+  @Getter
+  @Setter
+  private LocalDate lotExpirationDate;
 }

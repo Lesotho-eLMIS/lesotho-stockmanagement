@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.stockmanagement.domain.card.StockCard;
 import org.openlmis.stockmanagement.dto.ObjectReferenceDto;
+import org.openlmis.stockmanagement.dto.referencedata.LotDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableFulfillDto;
 import org.openlmis.stockmanagement.dto.referencedata.VersionObjectReferenceDto;
@@ -117,11 +119,17 @@ public class StockCardSummariesV2DtoBuilder {
     //resolve orderable & lot names -- this may cause merge conflicts - future updates from OpenLMIS
     String orderableName = "";
     String lotCode = "";
+    LocalDate lotExpirationDate = null;
+
     if (stockCard.getOrderableId() != null) {
       orderableName = orderableReferenceDataService.findOne(stockCard.getOrderableId()).getFullProductName();
     } 
     if (stockCard.getLotId() != null) {
-      lotCode = lotReferenceDataService.findOne(stockCard.getLotId()).getLotCode();
+      LotDto lot = lotReferenceDataService.findOne(stockCard.getLotId());
+      lotCode = lot.getLotCode();
+      if (lot.getExpirationDate() != null) {
+        lotExpirationDate = lot.getExpirationDate();
+      }
     }   
 
     return new CanFulfillForMeEntryDto(
@@ -133,7 +141,8 @@ public class StockCardSummariesV2DtoBuilder {
         stockCard.getProcessedDate(),
         stockCard.isActive(),
         orderableName,
-        lotCode
+        lotCode,
+        lotExpirationDate
       );
   }
 
