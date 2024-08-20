@@ -17,19 +17,20 @@ package org.openlmis.stockmanagement.service;
 
 import static org.openlmis.stockmanagement.service.PermissionService.STOCK_INVENTORIES_EDIT;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.Map;
+// import java.time.LocalDate;
+// import java.time.temporal.ChronoUnit;
+// import java.util.Collections;
+// import java.util.Map;
+
 import java.util.UUID;
 import org.openlmis.stockmanagement.domain.card.StockCard;
 import org.openlmis.stockmanagement.domain.identity.OrderableLotIdentity;
 import org.openlmis.stockmanagement.dto.StockEventDto;
 import org.openlmis.stockmanagement.dto.StockEventLineItemDto;
 import org.openlmis.stockmanagement.dto.referencedata.RightDto;
-import org.openlmis.stockmanagement.service.notifier.HighStockNotifier;
-import org.openlmis.stockmanagement.service.notifier.IssueStockNotifier;
-import org.openlmis.stockmanagement.service.notifier.LowStockNotifier;
+// import org.openlmis.stockmanagement.service.notifier.HighStockNotifier;
+// import org.openlmis.stockmanagement.service.notifier.IssueStockNotifier;
+// import org.openlmis.stockmanagement.service.notifier.LowStockNotifier;
 import org.openlmis.stockmanagement.service.notifier.StockoutNotifier;
 import org.openlmis.stockmanagement.service.referencedata.RightReferenceDataService;
 import org.slf4j.ext.XLogger;
@@ -50,20 +51,20 @@ public class StockEventNotificationProcessor {
   @Autowired
   private StockoutNotifier stockoutNotifier;
 
-  @Autowired
-  private LowStockNotifier lowStockNotifier;
+  // @Autowired
+  // private LowStockNotifier lowStockNotifier;
 
-  @Autowired
-  private HighStockNotifier highStockNotifier;
+  // @Autowired
+  // private HighStockNotifier highStockNotifier;
 
-  @Autowired
-  private StockCardSummariesService stockCardSummariesService;
+  // @Autowired
+  // private StockCardSummariesService stockCardSummariesService;
 
   @Autowired
   private RightReferenceDataService rightReferenceDataService;
 
-  @Autowired
-  private IssueStockNotifier issueStockNotifier;
+  // @Autowired
+  // private IssueStockNotifier issueStockNotifier;
 
   /**
    * From the stock event, check each line item's stock card and see if stock on
@@ -89,83 +90,104 @@ public class StockEventNotificationProcessor {
     OrderableLotIdentity identity = OrderableLotIdentity.identityOf(eventLine);
     StockCard stockCard = event.getContext().findCard(identity);
 
-    // Check if stockCard is null
-    if (stockCard == null) {
-      XLOGGER.error("StockCard not found for identity: {}", identity);
-      return;
-    }
-
-    if (eventLine.getDestinationId() != null) {
-      System.out.println("Issue stock to: " + eventLine.getDestinationId());
-      issueStockNotifier.notifyStockEditors(stockCard, rightId, eventLine);
-    }
-
-    int averageConsumption = (int) Math.ceil(averageConsumption(stockCard));
-    Integer aggregateStockOnHand = aggregateStockOnHand(stockCard);
-
-    if (aggregateStockOnHand == 0) {
+    if (stockCard.getStockOnHand() == 0) {
       stockoutNotifier.notifyStockEditors(stockCard, rightId);
-    } else if (aggregateStockOnHand < averageConsumption) {
-      lowStockNotifier.notifyStockEditors(stockCard, rightId, averageConsumption);
-    } else if (aggregateStockOnHand > (3 * averageConsumption)) {
-      highStockNotifier.notifyStockEditors(stockCard, rightId, averageConsumption);
     }
 
     profiler.stop().log();
     XLOGGER.exit();
   }
 
-  private double averageConsumption(StockCard stockCard) {
-    // Get the stock card aggregates for the past three months
-    Map<UUID, StockCardAggregate> stockCardsMap = stockCardSummariesService.getGroupedStockCards(
-        stockCard.getProgramId(),
-        stockCard.getFacilityId(),
-        Collections.singleton(stockCard.getOrderableId()),
-        LocalDate.now().minusMonths(3),
-        LocalDate.now());
+  /* The following functions have been commented to restore the original behavour
+   *  -- sending notifications for stockOuts only
+   */
+  // private void callNotifications(StockEventDto event, StockEventLineItemDto eventLine,
+  //     UUID rightId) {
+  //   XLOGGER.entry(event, eventLine);
+  //   Profiler profiler = new Profiler("CALL_NOTIFICATION_FOR_LINE_ITEM");
+  //   profiler.setLogger(XLOGGER);
 
-    // Retrieve the aggregate for the current stock card's orderable ID
-    StockCardAggregate aggregate = stockCardsMap.get(stockCard.getOrderableId());
+  //   profiler.start("COPY_STOCK_CARD");
+  //   OrderableLotIdentity identity = OrderableLotIdentity.identityOf(eventLine);
+  //   StockCard stockCard = event.getContext().findCard(identity);
 
-    if (aggregate == null) {
-      return 0; // No data available for this stock card
-    }
+  //   // Check if stockCard is null
+  //   if (stockCard == null) {
+  //     XLOGGER.error("StockCard not found for identity: {}", identity);
+  //     return;
+  //   }
 
-    // Get the total consumed amount
-    int totalConsumed = aggregate.getAmount("consumed", LocalDate.now().minusMonths(3), LocalDate.now());
-    totalConsumed = totalConsumed * -1;
+  //   if (eventLine.getDestinationId() != null) {
+  //     System.out.println("Issue stock to: " + eventLine.getDestinationId());
+  //     issueStockNotifier.notifyStockEditors(stockCard, rightId, eventLine);
+  //   }
 
-    // Calculate the number of days in the past three months
-    long daysInPeriod = ChronoUnit.DAYS.between(LocalDate.now().minusMonths(3), LocalDate.now());
+  //   int averageConsumption = (int) Math.ceil(averageConsumption(stockCard));
+  //   Integer aggregateStockOnHand = aggregateStockOnHand(stockCard);
 
-    // Get the total stockout days in the past three months
-    long stockOutDays = aggregate.getStockoutDays(LocalDate.now().minusMonths(3), LocalDate.now());
+  //   if (aggregateStockOnHand == 0) {
+  //     stockoutNotifier.notifyStockEditors(stockCard, rightId);
+  //   } else if (aggregateStockOnHand < averageConsumption) {
+  //     lowStockNotifier.notifyStockEditors(stockCard, rightId, averageConsumption);
+  //   } else if (aggregateStockOnHand > (3 * averageConsumption)) {
+  //     highStockNotifier.notifyStockEditors(stockCard, rightId, averageConsumption);
+  //   }
 
-    // Calculate the number of days when the stock was available
-    long availableDays = daysInPeriod - stockOutDays;
+  //   profiler.stop().log();
+  //   XLOGGER.exit();
+  // }
 
-    // Calculate the average monthly consumption
-    // Note: If there were no available days (to avoid division by zero), return 0
-    return availableDays > 0 ? (double) totalConsumed / availableDays * 30 : 0;
-  }
+  // private double averageConsumption(StockCard stockCard) {
+  //   // Get the stock card aggregates for the past three months
+  //   Map<UUID, StockCardAggregate> stockCardsMap = stockCardSummariesService.getGroupedStockCards(
+  //       stockCard.getProgramId(),
+  //       stockCard.getFacilityId(),
+  //       Collections.singleton(stockCard.getOrderableId()),
+  //       LocalDate.now().minusMonths(3),
+  //       LocalDate.now());
 
-  private Integer aggregateStockOnHand(StockCard stockCard) {
-    // Get the stock card aggregates for the past three months
-    Map<UUID, StockCardAggregate> stockCardsMap = stockCardSummariesService.getGroupedStockCards(
-        stockCard.getProgramId(),
-        stockCard.getFacilityId(),
-        Collections.singleton(stockCard.getOrderableId()),
-        LocalDate.now().minusMonths(3),
-        LocalDate.now());
+  //   // Retrieve the aggregate for the current stock card's orderable ID
+  //   StockCardAggregate aggregate = stockCardsMap.get(stockCard.getOrderableId());
 
-    // Retrieve the aggregate for the current stock card's orderable ID
-    StockCardAggregate aggregate = stockCardsMap.get(stockCard.getOrderableId());
+  //   if (aggregate == null) {
+  //     return 0; // No data available for this stock card
+  //   }
 
-    if (aggregate == null) {
-      return 0; // No data available for this stock card
-    }
+  //   // Get the total consumed amount
+  //   int totalConsumed = aggregate.getAmount("consumed", LocalDate.now().minusMonths(3), LocalDate.now());
+  //   totalConsumed = totalConsumed * -1;
 
-    return aggregate.getTotalStockOnHand();
-  }
+  //   // Calculate the number of days in the past three months
+  //   long daysInPeriod = ChronoUnit.DAYS.between(LocalDate.now().minusMonths(3), LocalDate.now());
+
+  //   // Get the total stockout days in the past three months
+  //   long stockOutDays = aggregate.getStockoutDays(LocalDate.now().minusMonths(3), LocalDate.now());
+
+  //   // Calculate the number of days when the stock was available
+  //   long availableDays = daysInPeriod - stockOutDays;
+
+  //   // Calculate the average monthly consumption
+  //   // Note: If there were no available days (to avoid division by zero), return 0
+  //   return availableDays > 0 ? (double) totalConsumed / availableDays * 30 : 0;
+  // }
+
+  // private Integer aggregateStockOnHand(StockCard stockCard) {
+  //   // Get the stock card aggregates for the past three months
+  //   Map<UUID, StockCardAggregate> stockCardsMap = stockCardSummariesService.getGroupedStockCards(
+  //       stockCard.getProgramId(),
+  //       stockCard.getFacilityId(),
+  //       Collections.singleton(stockCard.getOrderableId()),
+  //       LocalDate.now().minusMonths(3),
+  //       LocalDate.now());
+
+  //   // Retrieve the aggregate for the current stock card's orderable ID
+  //   StockCardAggregate aggregate = stockCardsMap.get(stockCard.getOrderableId());
+
+  //   if (aggregate == null) {
+  //     return 0; // No data available for this stock card
+  //   }
+
+  //   return aggregate.getTotalStockOnHand();
+  // }
 
 }
