@@ -31,6 +31,9 @@ public class CanFulfillForMeEntryDtoDataBuilder {
   private LocalDate occurredDate;
   private ZonedDateTime processedDate;
   private boolean active;
+  private String orderableName;
+  private String lotCode;
+  private LocalDate lotExpirationDate;
 
   /**
    * Creates builder for creating new instance of {@link CanFulfillForMeEntryDto}.
@@ -42,6 +45,9 @@ public class CanFulfillForMeEntryDtoDataBuilder {
     stockOnHand = 10;
     occurredDate = LocalDate.now();
     active = true;
+    orderableName = "Orderable";
+    lotCode = "LOT-001";
+    lotExpirationDate = LocalDate.of(1990, 1, 1);
   }
 
   /**
@@ -50,7 +56,7 @@ public class CanFulfillForMeEntryDtoDataBuilder {
    */
   public CanFulfillForMeEntryDto build() {
     return new CanFulfillForMeEntryDto(stockCard, orderable, lot, stockOnHand,
-        occurredDate, processedDate, active);
+        occurredDate, processedDate, active, orderableName, lotCode, lotExpirationDate);
   }
 
   /**

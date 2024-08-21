@@ -16,9 +16,9 @@ services:
     env_file: .env
   sonar:
     image: openlmis/dev:5.2
-    links:
-      - db
-      - log
+#    links:
+#      - db
+#      - log
     volumes:
       - '.:/app'
     entrypoint:
@@ -31,9 +31,9 @@ services:
   image:
     build: .
     image: elmislesotho/stockmanagement
-  db:
-    image: openlmis/postgres:12-debezium
-    env_file: .env
+#  db:
+#    image: openlmis/postgres:12-debezium
+#    env_file: .env
   log:
     image: openlmis/rsyslog:1
     volumes:

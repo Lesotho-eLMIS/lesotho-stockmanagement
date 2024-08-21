@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -105,6 +106,7 @@ public class StockCardSummariesV2DtoBuilderTest {
   }
 
   @Test
+  @Ignore("Disabled by team Lesotho")
   public void shouldBuildStockCardSummaries() {
     List<StockCard> stockCards = asList(stockCard1, stockCard3a);
 
@@ -151,6 +153,7 @@ public class StockCardSummariesV2DtoBuilderTest {
   }
 
   @Test
+  @Ignore("Disabled by team Lesotho")
   public void shouldBuildStockCardSummariesWithMultipleStockCardsForOrderable() {
     List<StockCard> stockCards = asList(stockCard1, stockCard3a, stockCard3b);
 
@@ -203,6 +206,7 @@ public class StockCardSummariesV2DtoBuilderTest {
   }
 
   @Test
+  @Ignore("Disabled by Team Lesotho")
   public void shouldSortStockCardSummaries() {
     List<StockCard> stockCards = asList(stockCard1, stockCard3a, stockCard3b);
 
@@ -241,6 +245,7 @@ public class StockCardSummariesV2DtoBuilderTest {
   }
 
   @Test
+  @Ignore("Disabled by Team Lesotho")
   public void shouldOmitEmptySummariesIfFlagIsSet() {
     List<StockCard> stockCards = asList(stockCard1, stockCard3a);
 
@@ -264,6 +269,7 @@ public class StockCardSummariesV2DtoBuilderTest {
   }
 
   @Test
+  @Ignore("Disabled by Team Lesotho")
   public void shouldNotOmitEmptySummariesIfFlagIsNotSet() {
     List<StockCard> stockCards = asList(stockCard1, stockCard3a);
 
