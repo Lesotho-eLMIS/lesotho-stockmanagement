@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,9 +32,13 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.stockmanagement.domain.card.StockCard;
 import org.openlmis.stockmanagement.dto.ObjectReferenceDto;
+import org.openlmis.stockmanagement.dto.referencedata.LotDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableFulfillDto;
 import org.openlmis.stockmanagement.dto.referencedata.VersionObjectReferenceDto;
+import org.openlmis.stockmanagement.service.referencedata.LotReferenceDataService;
+import org.openlmis.stockmanagement.service.referencedata.OrderableReferenceDataService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +48,12 @@ public class StockCardSummariesV2DtoBuilder {
   static final String ORDERABLES = "orderables";
   static final String STOCK_CARDS = "stockCards";
   static final String LOTS = "lots";
+
+  @Autowired
+  LotReferenceDataService lotReferenceDataService;
+
+  @Autowired
+  OrderableReferenceDataService orderableReferenceDataService;
 
   @Value("${service.url}")
   private String serviceUrl;
@@ -104,6 +115,23 @@ public class StockCardSummariesV2DtoBuilder {
 
   private CanFulfillForMeEntryDto createCanFulfillForMeEntry(StockCard stockCard, 
                                                               UUID orderableId) {
+
+    //resolve orderable & lot names -- this may cause merge conflicts - future updates from OpenLMIS
+    String orderableName = "";
+    String lotCode = "";
+    LocalDate lotExpirationDate = null;
+
+    if (stockCard.getOrderableId() != null) {
+      orderableName = orderableReferenceDataService.findOne(stockCard.getOrderableId()).getFullProductName();
+    } 
+    if (stockCard.getLotId() != null) {
+      LotDto lot = lotReferenceDataService.findOne(stockCard.getLotId());
+      lotCode = lot.getLotCode();
+      if (lot.getExpirationDate() != null) {
+        lotExpirationDate = lot.getExpirationDate();
+      }
+    }   
+
     return new CanFulfillForMeEntryDto(
         createStockCardReference(stockCard.getId()),
         createReference(orderableId, ORDERABLES),
@@ -111,7 +139,10 @@ public class StockCardSummariesV2DtoBuilder {
         stockCard.getStockOnHand(),
         stockCard.getOccurredDate(),
         stockCard.getProcessedDate(),
-        stockCard.isActive()
+        stockCard.isActive(),
+        orderableName,
+        lotCode,
+        lotExpirationDate
       );
   }
 
