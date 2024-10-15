@@ -15,52 +15,50 @@
 
 package org.openlmis.stockmanagement.web.stockcardsummariesv2;
 
-import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.openlmis.stockmanagement.dto.ObjectReferenceDto;
+import org.openlmis.stockmanagement.dto.referencedata.VersionObjectReferenceDto;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public final class CanFulfillForMeEntryDto {
+public final class StockCardSummaryResolvV2Dto implements Comparable<StockCardSummaryResolvV2Dto> {
 
   @Getter
   @Setter
-  private ObjectReferenceDto stockCard;
+  private VersionObjectReferenceDto orderable;
 
   @Getter
   @Setter
-  private ObjectReferenceDto orderable;
+  private Set<CanFulfillForMeEntryResolvDto> canFulfillForMe;
 
-  @Getter
-  @Setter
-  private ObjectReferenceDto lot;
+  /**
+   * Sums stock on hand values from all {@link CanFulfillForMeEntryResolvDto} instances.
+   * @return sum of all stock on hand values
+   */
+  public Integer getStockOnHand() {
+    List<CanFulfillForMeEntryResolvDto> fulfillEntries = isEmpty(canFulfillForMe) ? null : canFulfillForMe
+        .stream()
+        .filter(a -> a.getStockOnHand() != null)
+        .collect(toList());
 
-  @Getter
-  @Setter
-  private Integer stockOnHand;
+    return isEmpty(fulfillEntries) ? null : fulfillEntries.stream()
+        .mapToInt(CanFulfillForMeEntryResolvDto::getStockOnHand)
+        .sum();
+  }
 
-  @Getter
-  @Setter
-  @JsonFormat(shape = STRING)
-  private LocalDate occurredDate;
-
-  @Getter
-  @Setter
-  @JsonFormat(shape = STRING)
-  private ZonedDateTime processedDate;
-
-  @Getter
-  @Setter
-  private boolean active;
+  @Override
+  public int compareTo(StockCardSummaryResolvV2Dto stockCardSummary) {
+    return Integer.compare(stockCardSummary.canFulfillForMe.size(), this.canFulfillForMe.size());
+  }
 }

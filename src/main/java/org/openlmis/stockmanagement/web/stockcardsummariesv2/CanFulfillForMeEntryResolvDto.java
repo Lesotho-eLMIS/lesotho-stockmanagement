@@ -32,7 +32,7 @@ import org.openlmis.stockmanagement.dto.ObjectReferenceDto;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public final class CanFulfillForMeEntryDto {
+public final class CanFulfillForMeEntryResolvDto {
 
   @Getter
   @Setter
@@ -63,4 +63,16 @@ public final class CanFulfillForMeEntryDto {
   @Getter
   @Setter
   private boolean active;
+
+  @Getter
+  @Setter
+  private String orderableName;
+
+  @Getter
+  @Setter
+  private String lotCode;
+
+  @Getter
+  @Setter
+  private LocalDate lotExpirationDate;
 }

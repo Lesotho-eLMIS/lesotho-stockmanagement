@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.MapUtils;
 import org.openlmis.stockmanagement.domain.card.StockCard;
 import org.openlmis.stockmanagement.dto.ObjectReferenceDto;
+import org.openlmis.stockmanagement.dto.referencedata.LotDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderableFulfillDto;
 import org.openlmis.stockmanagement.dto.referencedata.VersionObjectReferenceDto;
@@ -41,7 +43,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StockCardSummariesV2DtoBuilder {
+public class StockCardSummariesResolvV2DtoBuilder {
 
   static final String ORDERABLES = "orderables";
   static final String STOCK_CARDS = "stockCards";
@@ -64,10 +66,10 @@ public class StockCardSummariesV2DtoBuilder {
    * @param orderables       map of orderable ids as keys and {@link OrderableFulfillDto}
    * @return list of {@link StockCardSummaryV2Dto}
    */
-  public List<StockCardSummaryV2Dto> build(List<OrderableDto> approvedProducts,
+  public List<StockCardSummaryResolvV2Dto> build(List<OrderableDto> approvedProducts,
       List<StockCard> stockCards, Map<UUID, OrderableFulfillDto> orderables,
       boolean nonEmptySummariesOnly) {
-    Stream<StockCardSummaryV2Dto> summariesStream = approvedProducts.stream()
+    Stream<StockCardSummaryResolvV2Dto> summariesStream = approvedProducts.stream()
         .map(p -> build(stockCards, p.getId(), p.getMeta().getVersionNumber(),
             MapUtils.isEmpty(orderables) ? null : orderables.get(p.getId())))
         .sorted();
@@ -80,10 +82,10 @@ public class StockCardSummariesV2DtoBuilder {
     return summariesStream.sorted().collect(toList());
   }
 
-  private StockCardSummaryV2Dto build(List<StockCard> stockCards, UUID orderableId,
+  private StockCardSummaryResolvV2Dto build(List<StockCard> stockCards, UUID orderableId,
                                       Long orderableVersionNumber, OrderableFulfillDto fulfills) {
 
-    Set<CanFulfillForMeEntryDto> canFulfillSet = null == fulfills ? new HashSet<>()
+    Set<CanFulfillForMeEntryResolvDto> canFulfillSet = null == fulfills ? new HashSet<>()
         : fulfills.getCanFulfillForMe()
         .stream()
         .map(id -> buildFulfillsEntries(id,
@@ -96,11 +98,11 @@ public class StockCardSummariesV2DtoBuilder {
             orderableId,
             findStockCardByOrderableId(orderableId, stockCards)));
 
-    return new StockCardSummaryV2Dto(createVersionReference(
+    return new StockCardSummaryResolvV2Dto(createVersionReference(
             orderableId, ORDERABLES, orderableVersionNumber),canFulfillSet);
   }
 
-  private List<CanFulfillForMeEntryDto> buildFulfillsEntries(UUID orderableId,
+  private List<CanFulfillForMeEntryResolvDto> buildFulfillsEntries(UUID orderableId,
                                                      List<StockCard> stockCards) {
     if (isEmpty(stockCards)) {
       return Collections.emptyList();
@@ -111,17 +113,36 @@ public class StockCardSummariesV2DtoBuilder {
     }
   }
 
-  private CanFulfillForMeEntryDto createCanFulfillForMeEntry(StockCard stockCard, 
-                                                              UUID orderableId) { 
+  private CanFulfillForMeEntryResolvDto createCanFulfillForMeEntry(StockCard stockCard, 
+                                                              UUID orderableId) {
 
-    return new CanFulfillForMeEntryDto(
+    //resolve orderable & lot names -- this may cause merge conflicts - future updates from OpenLMIS
+    String orderableName = "";
+    String lotCode = "";
+    LocalDate lotExpirationDate = null;
+
+    if (stockCard.getOrderableId() != null) {
+      orderableName = orderableReferenceDataService.findOne(stockCard.getOrderableId()).getFullProductName();
+    } 
+    if (stockCard.getLotId() != null) {
+      LotDto lot = lotReferenceDataService.findOne(stockCard.getLotId());
+      lotCode = lot.getLotCode();
+      if (lot.getExpirationDate() != null) {
+        lotExpirationDate = lot.getExpirationDate();
+      }
+    }   
+
+    return new CanFulfillForMeEntryResolvDto(
         createStockCardReference(stockCard.getId()),
         createReference(orderableId, ORDERABLES),
         stockCard.getLotId() == null ? null : createLotReference(stockCard.getLotId()),
         stockCard.getStockOnHand(),
         stockCard.getOccurredDate(),
         stockCard.getProcessedDate(),
-        stockCard.isActive()
+        stockCard.isActive(),
+        orderableName,
+        lotCode,
+        lotExpirationDate
       );
   }
 
