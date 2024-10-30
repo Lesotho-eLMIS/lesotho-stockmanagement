@@ -16,9 +16,17 @@
 package org.openlmis.stockmanagement.repository;
 
 import java.util.UUID;
-import org.openlmis.stockmanagement.domain.eventdraft.StockEventDraft;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface StockEventsDraftRepository extends
-    PagingAndSortingRepository<StockEventDraft, UUID> {
+import org.openlmis.stockmanagement.domain.eventdraft.StockEventDraft;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+
+public interface StockEventsDraftRepository extends PagingAndSortingRepository<StockEventDraft, UUID> {
+
+    Page<StockEventDraft> findByProgramIdAndFacilityId(
+      @Param("programId") UUID programId,
+      @Param("facilityId") UUID facilityId,
+      Pageable pageable);
 }
