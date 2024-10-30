@@ -25,6 +25,7 @@ import org.openlmis.stockmanagement.dto.DraftDiscrepancyDto;
 import org.openlmis.stockmanagement.dto.StockEventDraftDto;
 import org.openlmis.stockmanagement.dto.StockEventLineItemDraftDto;
 import org.openlmis.stockmanagement.repository.StockEventsDraftRepository;
+import org.openlmis.stockmanagement.service.requisition.RejectionReasonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +40,9 @@ public class StockEventDraftService {
 
   @Autowired
   private StockEventsDraftRepository stockEventsDraftRepository;
+
+  @Autowired
+  private RejectionReasonService rejectionReasonService;
 
   /**
    * Get a page of draft stock events.
@@ -117,7 +121,7 @@ public class StockEventDraftService {
 
     return DraftDiscrepancyDto.builder()
       .quantityAffected(draftDiscrepancy.getQuantityAffected())
-      //.rejectionReasonId(draftDiscrepancy.getRejectionReasonId())
+      .rejectionReason(rejectionReasonService.findOne(draftDiscrepancy.getRejectionReasonId()))
       .comments(draftDiscrepancy.getComments())
       .build();
   }

@@ -20,7 +20,6 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import org.openlmis.stockmanagement.dto.StockEventDraftDto;
