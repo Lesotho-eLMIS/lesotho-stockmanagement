@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,13 +33,13 @@ import org.openlmis.stockmanagement.domain.common.VvmApplicable;
 import org.openlmis.stockmanagement.domain.eventdraft.DraftDiscrepancy;
 import org.openlmis.stockmanagement.domain.eventdraft.StockEventLineItemDraft;
 import org.openlmis.stockmanagement.domain.identity.IdentifiableByOrderableLot;
-import org.openlmis.stockmanagement.domain.physicalinventory.PhysicalInventoryLineItemAdjustment;
 import org.openlmis.stockmanagement.domain.qualitychecks.Discrepancy;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class StockEventLineItemDraftDto implements IdentifiableByOrderableLot, VvmApplicable {
   private UUID orderableId;
   private UUID lotId;
@@ -63,7 +63,6 @@ public class StockEventLineItemDraftDto implements IdentifiableByOrderableLot, V
 
   private Integer quantityShipped;
   private Integer quantityOnDeliveryNote;
-  private List<StockEventAdjustmentDto> stockAdjustments;
   private List<DraftDiscrepancyDto> discrepancies;
   
 
@@ -109,20 +108,6 @@ public class StockEventLineItemDraftDto implements IdentifiableByOrderableLot, V
 
   public boolean hasDestinationId() {
     return this.destinationId != null;
-  }
-
-  /**
-   * Gets stock adjustments as {@link PhysicalInventoryLineItemAdjustment}.
-   */
-  public List<PhysicalInventoryLineItemAdjustment> stockAdjustments() {
-    if (null == stockAdjustments) {
-      return emptyList();
-    }
-
-    return stockAdjustments
-        .stream()
-        .map(StockEventAdjustmentDto::toPhysicalInventoryLineItemAdjustment)
-        .collect(Collectors.toList());
   }
 
   /**

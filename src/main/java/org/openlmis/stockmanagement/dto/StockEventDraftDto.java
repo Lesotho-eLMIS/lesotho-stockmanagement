@@ -16,18 +16,19 @@
 package org.openlmis.stockmanagement.dto;
 
 import static java.time.ZonedDateTime.now;
-import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Sets;
+
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.stockmanagement.domain.eventdraft.StockEventDraft;
@@ -37,7 +38,10 @@ import org.openlmis.stockmanagement.util.StockEventProcessContext;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class StockEventDraftDto {
+
+  private UUID id;
 
   private UUID resourceId;
 
@@ -52,6 +56,8 @@ public class StockEventDraftDto {
   private UUID userId;
 
   private boolean isActive;
+
+  private LocalDateTime processedDate;
 
   private List<StockEventLineItemDraftDto> lineItems;
 
@@ -133,14 +139,14 @@ public class StockEventDraftDto {
         reasonIds.add(lineItem.getReasonId());
       }
 
-      Set<UUID> adjustmentReasons = Optional
-          .ofNullable(lineItem.getStockAdjustments())
-          .orElse(emptyList())
-          .stream()
-          .map(StockEventAdjustmentDto::getReasonId)
-          .collect(Collectors.toSet());
+      // Set<UUID> adjustmentReasons = Optional
+      //     .ofNullable(lineItem.getStockAdjustments())
+      //     .orElse(emptyList())
+      //     .stream()
+      //     .map(StockEventAdjustmentDto::getReasonId)
+      //     .collect(Collectors.toSet());
 
-      reasonIds.addAll(adjustmentReasons);
+      // reasonIds.addAll(adjustmentReasons);
     }
 
     return reasonIds;

@@ -302,6 +302,34 @@ traits:
             body:
               application/json:
                   schema: localizedMessage
+      get:
+        is: [ secured ]
+        description: Get draft stock events by facility and program
+        queryParameters:
+          facility:
+            required: true
+          program:
+            required: true
+        responses:
+          200:
+            description: |
+              Returns a page of drafts.
+            headers:
+              X-Content-Type-Options:
+              X-XSS-Protection:
+            body:
+              application/json:
+                schema: stockCardTemplate
+          404:
+            description: Drafts not found for the given query parameter.
+            body:
+              application/json:
+                schema: localizedMessage
+          400:
+            body:
+              application/json:
+                  schema: localizedMessage
+            description: Provided query parameters are not correctly formatted.
 
   /stockCardSummaries:
       get:

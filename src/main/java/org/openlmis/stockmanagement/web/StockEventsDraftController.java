@@ -16,18 +16,26 @@
 package org.openlmis.stockmanagement.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import org.openlmis.stockmanagement.dto.StockEventDraftDto;
 import org.openlmis.stockmanagement.service.HomeFacilityPermissionService;
 import org.openlmis.stockmanagement.service.PermissionService;
 import org.openlmis.stockmanagement.service.StockEventDraftProcessor;
+import org.openlmis.stockmanagement.service.StockEventDraftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -35,13 +43,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Controller used to create stock event.
  */
 @Controller
 @Transactional
-@RequestMapping("/api")
+@RequestMapping("/api/stockEventsDraft")
 public class StockEventsDraftController extends BaseController {
   private static final Logger LOGGER = LoggerFactory.getLogger(StockEventsDraftController.class);
 
@@ -54,13 +63,17 @@ public class StockEventsDraftController extends BaseController {
   @Autowired
   private StockEventDraftProcessor stockEventDraftProcessor;
 
+  @Autowired
+  private StockEventDraftService stockEventDraftService;
+
   /**
-   * Create stock event.
+   * Create draft stock event.
    *
    * @param eventDto a stock event bound to request body.
    * @return created stock event's ID.
    */
-  @RequestMapping(value = "stockEventsDraft", method = POST)
+  @Transactional
+  @RequestMapping(method = POST)
   public ResponseEntity<UUID> createStockEventDraft(@RequestBody StockEventDraftDto eventDto) {
     LOGGER.debug("Try to create a draft stock event");
 
@@ -75,6 +88,27 @@ public class StockEventsDraftController extends BaseController {
     ResponseEntity<UUID> response = new ResponseEntity<>(createdEventId, CREATED);
 
     return stopProfiler(profiler, response);
+  }
+
+  /**
+   * Get a draft stock events by program and facility.
+   *
+   * @return Stock event drafts.
+   */
+  @RequestMapping(method = GET)
+  public ResponseEntity<Page<StockEventDraftDto>> getStockEventDrafts(
+      @RequestParam() UUID programId,
+      @RequestParam() UUID facilityId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    // LOGGER.debug("Try to find draft stock events");
+    // permissionService.canViewStockCard(program, facility);
+    Pageable pageable = PageRequest.of(page, size, Sort.by("processedDate").descending());
+    Page<StockEventDraftDto> draftsPage = 
+        stockEventDraftService.findDraftStockEvents(programId, facilityId, pageable);
+
+    return new ResponseEntity<>(draftsPage, OK);
   }
 
   private void checkPermission(StockEventDraftDto eventDto, Profiler profiler) {
@@ -99,5 +133,4 @@ public class StockEventsDraftController extends BaseController {
       }
     }
   }
-
 }
