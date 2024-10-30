@@ -273,6 +273,35 @@ traits:
             body:
               application/json:
                   schema: localizedMessage
+                  
+  /stockEventsDraft:
+      post:
+        is: [ secured ]
+        description: Create a draft stock event with one or more orderables.
+        body:
+          application/json:
+            schema: stockEventDto
+
+        responses:
+          201:
+            description: A draft stock event has been processed with no validatoin error or persistence error.
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: uuid
+
+          400:
+            description: Failed to process stock event due to validation error.
+            body:
+              application/json:
+                  schema: localizedMessage
+
+          403:
+            description: User does not have permission to save a draft stock events for given facility and program.
+            body:
+              application/json:
+                  schema: localizedMessage
 
   /stockCardSummaries:
       get:
