@@ -319,7 +319,7 @@ traits:
               X-XSS-Protection:
             body:
               application/json:
-                schema: stockCardTemplate
+                schema: stockEventDto
           404:
             description: Drafts not found for the given query parameter.
             body:
@@ -330,6 +330,72 @@ traits:
               application/json:
                   schema: localizedMessage
             description: Provided query parameters are not correctly formatted.
+
+      /{id}:
+          get:
+            is: [ secured ]
+            description: Get a single draft by id.
+
+            responses:
+              200:
+                body:
+                  application/json:
+                    schema: stockEventDto
+
+              404:
+                description: Stock event draft with given id does not exist.
+                body:
+                  application/json:
+                    schema: localizedMessage
+
+              403:
+                description: User does not have permission to view stock event draft.
+                body:
+                  application/json:
+                    schema: localizedMessage
+          delete:
+            is: [ secured ]
+            description: Delete a single draft by id.
+
+            responses:
+              200:
+                body:
+                  application/json:
+                    schema: stockEventDto
+
+              404:
+                description: Stock event draft with given id does not exist.
+                body:
+                  application/json:
+                    schema: localizedMessage
+
+              403:
+                description: User does not have permission to delete stock event draft.
+                body:
+                  application/json:
+                    schema: localizedMessage
+          put:
+            is: [ secured ]
+            description: Update a single draft by id.
+
+            responses:
+              200:
+                body:
+                  application/json:
+                    schema: stockEventDto
+
+              404:
+                description: Stock event draft with given id does not exist.
+                body:
+                  application/json:
+                    schema: localizedMessage
+
+              403:
+                description: User does not have permission to update stock event draft.
+                body:
+                  application/json:
+                    schema: localizedMessage
+
 
   /stockCardSummaries:
       get:

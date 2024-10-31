@@ -35,14 +35,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Controller used to create stock event.
@@ -109,6 +116,53 @@ public class StockEventsDraftController extends BaseController {
 
     return new ResponseEntity<>(draftsPage, OK);
   }
+
+  /**
+   * Get Stockevent draft by id (uuid).
+   * Returns draft matching the given id.
+   */
+  @GetMapping("/{id}")
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<StockEventDraftDto> getStockEventDraft(@PathVariable UUID id) {
+    StockEventDraftDto draft = stockEventDraftService.getDraftById(id);
+    return new ResponseEntity<>(draft, OK);
+  }
+
+  /**
+   * Update a Stockevent draft.
+   *
+   * @param id draft id.
+   * @param dto draft dto.
+   * @return Updated draft dto.
+   */
+  @Transactional
+  @PutMapping("/{id}")
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<StockEventDraftDto> updateStockEventDraft(@PathVariable UUID id,
+                                                    @RequestBody StockEventDraftDto dto) {
+    StockEventDraftDto updatedDraft = stockEventDraftService.updateStockEventDraft(id, dto);
+    return new ResponseEntity<>(updatedDraft, OK);
+  }
+
+  /**
+   * Delete a Stockevent draft.
+   *
+   * @param id draft id.
+   *
+   */
+  @Transactional
+  @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStockEventDraft(@PathVariable UUID id) {
+        boolean deleted = stockEventDraftService.deleteStockEventDraft(id);
+        
+        if (deleted) {
+            return ResponseEntity.noContent().build(); // HTTP 204 No Content for successful deletion
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // HTTP 404 if not found
+        }
+    }
 
   private void checkPermission(StockEventDraftDto eventDto, Profiler profiler) {
     OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder

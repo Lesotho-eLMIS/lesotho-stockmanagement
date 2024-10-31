@@ -31,7 +31,7 @@ import org.openlmis.stockmanagement.dto.requisition.RejectionReasonDto;
 @NoArgsConstructor
 @Builder
 public class DraftDiscrepancyDto {
-
+  
   private UUID id;
   private RejectionReasonDto rejectionReason;
   private Integer quantityAffected;

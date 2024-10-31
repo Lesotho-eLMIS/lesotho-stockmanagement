@@ -15,8 +15,11 @@
 
 package org.openlmis.stockmanagement.service;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.openlmis.stockmanagement.domain.eventdraft.DraftDiscrepancy;
 import org.openlmis.stockmanagement.domain.eventdraft.StockEventDraft;
@@ -57,6 +60,81 @@ public class StockEventDraftService {
         .findByProgramIdAndFacilityId(programId, facilityId, pageable);
 
     return pageOfEvents.map(this::stockEventDraftToDto);  
+  }
+
+  /**
+   * Get a draft.
+   *
+   * @param id draft id.
+   *
+   * @return a StockEventDraft dto.
+   */
+  public StockEventDraftDto getDraftById(UUID id) {
+    Optional<StockEventDraft> draftOptional = stockEventsDraftRepository.findById(id);
+
+    if (draftOptional.isPresent()) {
+      return stockEventDraftToDto(draftOptional.get());
+    }
+    return null;
+  }
+
+  /**
+   * Delete a Draft.
+   *
+   * @param id draft id.
+   * 
+   * @return a updated draft dto.
+   */
+  @Transactional
+  public boolean deleteStockEventDraft(UUID id) {
+    if (!stockEventsDraftRepository.existsById(id)) {
+        return false;
+    }
+    stockEventsDraftRepository.deleteById(id);
+    return true;
+  }
+
+  /**
+   * Update a Draft.
+   *
+   * @param id draft id.
+   * @param dto draft dto.
+   * @return a updated draft dto.
+   */
+  @Transactional
+  public StockEventDraftDto updateStockEventDraft(UUID id, StockEventDraftDto dto) {
+    Optional<StockEventDraft> existingDraftOptional = stockEventsDraftRepository.findById(id);
+
+    if (!existingDraftOptional.isPresent()) {
+      return null;
+    }
+
+    StockEventDraft existingDraft = existingDraftOptional.get();
+    
+    updateStockEventDraftFromDto(existingDraft, dto);
+
+    StockEventDraft stockEventDraft = stockEventsDraftRepository.save(existingDraft);
+    return stockEventDraftToDto(stockEventDraft);
+  }
+
+  /**
+   * Converts StockEventDraftDto to StockEventDraft and updates existing entity.
+   */
+  private void updateStockEventDraftFromDto(StockEventDraft stockEventDraft, StockEventDraftDto dto) {
+    // stockEventDraft.setFacilityId(dto.getFacilityId());
+    // stockEventDraft.setProgramId(dto.getProgramId());
+    // stockEventDraft.setUserId(dto.getUserId());
+    // stockEventDraft.setProcessedDate(dto.getProcessedDate());
+    // stockEventDraft.setActive(dto.isActive());
+    stockEventDraft.setSignature(dto.getSignature());
+    stockEventDraft.setDocumentNumber(dto.getDocumentNumber());
+
+    stockEventDraft.getLineItemsDraft().clear();
+    dto.getLineItems().forEach(lineItemDto -> {
+        StockEventLineItemDraft lineItemDraft = lineItemDraftToEntity(lineItemDto);
+        lineItemDraft.setStockEventDraft(stockEventDraft);
+        stockEventDraft.getLineItemsDraft().add(lineItemDraft);
+    });
   }
 
   /**
@@ -125,4 +203,55 @@ public class StockEventDraftService {
       .comments(draftDiscrepancy.getComments())
       .build();
   }
+
+  private StockEventLineItemDraft lineItemDraftToEntity(StockEventLineItemDraftDto dto) {
+    if (dto == null) {
+        return null;
+    }
+
+    StockEventLineItemDraft lineItemDraft = new StockEventLineItemDraft();
+    lineItemDraft.setOrderableId(dto.getOrderableId());
+    lineItemDraft.setLotId(dto.getLotId());
+    lineItemDraft.setQuantity(dto.getQuantity());
+    lineItemDraft.setExtraData(dto.getExtraData());
+    lineItemDraft.setOccurredDate(dto.getOccurredDate());
+    lineItemDraft.setReasonId(dto.getReasonId());
+    lineItemDraft.setReasonFreeText(dto.getReasonFreeText());
+    lineItemDraft.setSourceId(dto.getSourceId());
+    lineItemDraft.setSourceFreeText(dto.getSourceFreeText());
+    lineItemDraft.setDestinationId(dto.getDestinationId());
+    lineItemDraft.setDestinationFreeText(dto.getDestinationFreeText());
+    lineItemDraft.setReferenceNumber(dto.getReferenceNumber());
+    lineItemDraft.setCartonNumber(dto.getCartonNumber());
+    lineItemDraft.setInvoiceNumber(dto.getInvoiceNumber());
+    lineItemDraft.setUnitPrice(dto.getUnitPrice());
+    lineItemDraft.setQuantityRejected(dto.getQuantityRejected());
+    lineItemDraft.setRejectionReasonId(dto.getRejectionReasonId());
+    lineItemDraft.setRejectionReasonFreeText(dto.getRejectionReasonFreeText());
+    lineItemDraft.setQuantityShipped(dto.getQuantityShipped());
+    lineItemDraft.setQuantityOnDeliveryNote(dto.getQuantityOnDeliveryNote());
+
+    // Convert discrepancies from DTO to entity
+    if (dto.getDiscrepancies() != null) {
+        lineItemDraft.setDraftDiscrepancies(dto.getDiscrepancies().stream()
+            .map(this::draftDiscrepancyToEntity)
+            .collect(Collectors.toList()));
+    }
+
+    return lineItemDraft;
+  }
+
+  private DraftDiscrepancy draftDiscrepancyToEntity(DraftDiscrepancyDto dto) {
+    if (dto == null) {
+        return null;
+    }
+
+    return new DraftDiscrepancy(
+        dto.getRejectionReason() != null ? dto.getRejectionReason().getId() : null,
+        dto.getQuantityAffected(),
+        dto.getComments()
+    );
+  }
+
+
 }
