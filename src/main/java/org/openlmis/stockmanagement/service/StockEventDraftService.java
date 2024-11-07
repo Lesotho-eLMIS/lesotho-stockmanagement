@@ -110,6 +110,14 @@ public class StockEventDraftService {
     }
 
     StockEventDraft existingDraft = existingDraftOptional.get();
+
+    // Ensure existing line items are removed 
+    if (existingDraft.getLineItemsDraft() != null) { 
+      existingDraft.getLineItemsDraft().forEach(lineItem -> { 
+        lineItem.setStockEventDraft(null); // Detach from the parent entity 
+      }); 
+      existingDraft.getLineItemsDraft().clear(); 
+    }
     
     updateStockEventDraftFromDto(existingDraft, dto);
 
