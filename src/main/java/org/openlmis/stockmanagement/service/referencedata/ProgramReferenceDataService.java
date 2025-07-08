@@ -15,11 +15,10 @@
 
 package org.openlmis.stockmanagement.service.referencedata;
 
-import java.util.Collection;
-import java.util.HashMap;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

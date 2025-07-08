@@ -97,10 +97,10 @@ idea {
             xmlFile.asNode().component
                     .find { it.@name == 'CompilerConfiguration' }['annotationProcessing'][0]
                     .replaceNode {
-                        annotationProcessing {
-                            profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
-                        }
-                    }
+                annotationProcessing {
+                    profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
+                }
+            }
         }
     }
     module {
@@ -119,7 +119,21 @@ flyway {
     placeholderSuffix = ']'
 }
 
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
 
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
 
 task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -216,6 +230,10 @@ test {
         events 'started', 'passed'
         exceptionFormat = 'full'
     }
+    dependsOn checkstyleMain
+    dependsOn checkstyleTest
+    dependsOn pmdMain
+    dependsOn pmdTest
 }
 
 //enable the lines below if you need to debug spring running in docker
@@ -290,6 +308,9 @@ uploadArchives {
 uploadArchives.onlyIf { project.getProperty("ossrhUsername") && project.getProperty("ossrhPassword") }
 
 apply from: "documentation.gradle"
+integrationTest {
+    dependsOn ramlToHtml
+}
 
 processResources {
     // we want the generated HTML spec file included in the output jar
@@ -303,6 +324,7 @@ processResources {
 
 check {
     dependsOn checkApiIsRaml
+    dependsOn integrationTest
     finalizedBy uploadArchives
 }
 
