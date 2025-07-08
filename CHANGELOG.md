@@ -1,10 +1,72 @@
+Upcoming Version (WIP)
+==================
+
+Improvements:
+* [SELV3-814](https://openlmis.atlassian.net/browse/SELV3-814): Added `POST /api/stockCards/deactivate` endpoint
+  * Allows to deactivate a batch of stock cards
+
+5.2.0 / 2025-03-31
+==================
+
+**Requires referencedata:15.3.0 or later**
+
+Improvements:
+* [OE-86](https://openlmis.atlassian.net/browse/OE-86): Added `/api/public/stockCardSummaries` endpoint
+  * Equivalent to `/api/v2/stockCardSummaries`, tailored for external integrations
+* [OE-87](https://openlmis.atlassian.net/browse/OE-87): Added `/api/public/stockEvents` endpoint
+  * Equivalent to `/api/stockEvents`, tailored for external integrations
+* [OLMIS-8135](https://openlmis.atlassian.net/browse/OLMIS-8135): Fetching valid sources and destinations now supports a list of programs as a parameter
+* Minor coverage updates and code analysis improvements.
+
+Bug Fixes:
+* [OLMIS-8071](https://openlmis.atlassian.net/browse/OLMIS-8071): Stock-out days calculations (360-day calendar)
+  * Fixed issue where a full month of stock-out was incorrectly counted as 29 days instead of 30
+  * `endDate` taken from the period is now converted to an exclusive limit
+    * Months with 31 days return **30** stock-out days when no stock is available
+    * Months with 30 days return **30** stock-out days when no stock is available
+    * Stock movements within a period:
+      * Receiving stock on the **13th** and issuing on the **19th** in a **31-day month** results in **24** stock-out days
+      * Receiving stock on the **13th** and issuing on the **19th** in a **30-day month** results in **24** stock-out days
+    * A full **February** without stock is now counted as **30** days
+
+5.1.12 / 19.11.2024
+==================
+
+Patch release with performance improvements.
+
+Improvements:
+* [SELV3-770](https://openlmis.atlassian.net/browse/SELV3-770): Improve performance of filtering for Valid Sources and
+ Valid Destinations
+
+5.1.11 / 31.10.2024
+==================
+
+Bug fixes:
+* [OLMIS-8020](https://openlmis.atlassian.net/browse/OLMIS-8020): Fix issue where it was not possible to create a requisition 
+when a program had `Enable Stock on Hand to populate from stock cards` flag checked
+
+Improvements:
+* [OLMIS-7895](https://openlmis.atlassian.net/browse/OLMIS-7895): Add demo data for BUQ and TB Monthly
+* [OLMIS-7953](https://openlmis.atlassian.net/browse/OLMIS-7953): Improve some API calls performance
+* [OIS-14](https://openlmis.atlassian.net/browse/OIS-14): Upgrade Transifex API version
+* [OIS-48](https://openlmis.atlassian.net/browse/OIS-48): Update service base images to versions without known vulnerabilities
+* [SELV3-718](https://openlmis.atlassian.net/browse/SELV3-718): Add filtering by geographic zone for valid sources and destinations
+
+5.1.10 / 2024-04-19
+==================
+
+Bug fixes:
+* [OLMIS-7910](https://openlmis.atlassian.net/browse/OLMIS-7910): Fixed wrong stock on hand on first Receive
+
 5.1.9 / 2023-06-26
 ==================
+
 Bug fixes:
 * [OD-37](https://openlmis.atlassian.net/browse/OD-37): Fixed wrong stockout days calculation
 
 5.1.8 / 2023-04-05
 ==================
+
 Bug fixes:
 * [OLMIS-7373](https://openlmis.atlassian.net/browse/OLMIS-7373): Fixed filtering by lot code in stock on hand
 * [OLMIS-7711](https://openlmis.atlassian.net/browse/OLMIS-7711): Fixed wrong stockout days calculation

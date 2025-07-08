@@ -53,12 +53,14 @@ schemas:
   - stockCardTemplate: !include schemas/stockCardTemplate.json
   - stockEventDto: !include schemas/stockEventDto.json
   - stockEventLineItemDto: !include schemas/stockEventLineItemDto.json
+  - stockEventExternalDto: !include schemas/stockEventExternalDto.json
+  - stockEventLineItemExternalDto: !include schemas/stockEventLineItemExternalDto.json
 
   - stockCard: !include schemas/stockCard.json
   - stockCardPage: !include schemas/stockCard.json
   - stockCardSummariesPage: !include schemas/stockCardSummaryV2Page.json
   - stockCardSummaries: !include schemas/stockCardSummaries.json
-  - allStockCardSummaries: !include schemas/stockCardSummaries.json
+  - stockCardSummariesExternalPage: !include schemas/stockCardSummariesExternalPage.json
   - stockCardReasonSummaryPage: !include schemas/stockCardRangeSummaryPage.json
   - validSourceDestination: !include schemas/validSourceDestination.json
   - validSourceDestinations: |
@@ -570,6 +572,18 @@ traits:
                   body:
                       application/json:
                           schema: stockCardPage
+      /deactivate:
+        post:
+          is: [ secured ]
+          description: Set stock cards as inactive.
+          responses:
+            200:
+              body:
+                application/json:
+            404:
+              description: At least one stock card with given id does not exist, can not make inactive.
+              body:
+                application/json:
       /{id}:
           get:
             is: [ secured ]
@@ -637,6 +651,9 @@ traits:
           facilityId:
             required: false
             description: Facility ID, indicates the facility that the valid destinations are under.
+          geographicZoneId:
+            required: false
+            description: Geographic Zone ID of facility, if node refers to facility.
         responses:
           200:
             body:
@@ -713,6 +730,9 @@ traits:
             facilityId:
               required: false
               description: Facility ID, indicates the facility that the valid sources are under.
+            geographicZoneId:
+              required: false
+              description: Geographic Zone ID of facility, if node refers to facility.
           responses:
             200:
               body:
@@ -821,6 +841,7 @@ traits:
             description: Program id
             type: string
             required: false
+            repeat: true
           facilityType:
             description: Facility type id
             type: string
@@ -1413,4 +1434,62 @@ traits:
               description: User does not have permission to delete a Complaint.
               body:
                 application/json:
-                    schema: localizedMessage            
+                    schema: localizedMessage   
+
+  /public:
+
+    /stockCardSummaries:
+      get:
+        is: [ secured, paginated ]
+        description: Get summaries of stock cards, which contains SOH, product name, lot and other essential information.
+        queryParameters:
+          facility:
+            required: true
+            description: Facility Code, indicates the facility.
+          program:
+            required: false
+            repeat: true
+            description: Program Code, indicates the program.
+          code:
+            required: false
+            repeat: false
+            description: Orderable Code, indicates the orderable.
+        responses:
+          200:
+            body:
+              application/json:
+                schema: stockCardSummariesExternalPage
+          403:
+            description: User does not have permission to view stock cards of given facility and program.
+            body:
+              application/json:
+                schema: localizedMessage
+
+    /stockEvents:
+      post:
+        is: [ secured ]
+        description: Create a new stock event with one or more orderables - for external integrators use.
+        body:
+          application/json:
+            schema: stockEventExternalDto
+
+        responses:
+          201:
+            description: Stock event has been processed with no validatoin error or persistence error.
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: uuid
+
+          400:
+            description: Failed to process stock event due to validation error.
+            body:
+              application/json:
+                schema: localizedMessage
+
+          403:
+            description: User does not have permission to create stock events for given facility and program.
+            body:
+              application/json:
+                schema: localizedMessage           

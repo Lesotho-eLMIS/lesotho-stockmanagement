@@ -272,6 +272,22 @@ public abstract class MessageKeys {
   public static final String ERROR_SIZE_NOT_POSITIVE
           = ERROR_PREFIX + ".pageable.size.notPositive";
 
+  public static final String ERROR_FACILITY_CODE_PARAM_MISSING =
+      ERROR_PREFIX + ".facilityCode.param.missing";
+  public static final String ERROR_FACILITY_CODE_PARAM_MORE_THEN_ONE =
+      ERROR_PREFIX + ".facilityCode.param.moreThenOne";
+  public static final String ERROR_FACILITY_CODE_NOT_FOUND =
+      ERROR_PREFIX + ".facility.code.notFound";
+
+  public static final String ERROR_PROGRAM_CODE_NOT_FOUND =
+      ERROR_PREFIX + ".program.code.notFound";
+
+  public static final String ERROR_LOTS_NOT_FOUND = ERROR_PREFIX + ".lot.codes.notFound";
+  public static final String ERROR_ORDERABLES_NOT_FOUND =
+      ERROR_PREFIX + ".orderable.codes.notFound";
+  public static final String ERROR_REASONS_NOT_FOUND =
+      ERROR_PREFIX + ".reason.names.notFound";
+
   private MessageKeys() {
     throw new UnsupportedOperationException();
   }
