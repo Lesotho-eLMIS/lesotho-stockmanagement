@@ -76,8 +76,11 @@ public class CalculatedStockOnHandService {
     List<StockCard> stockCards = findStockCards(facilityId, orderableIds, programIds);
 
     // FIXME: This most likely could be done as one SQL
-    stockCards.forEach(stockCard ->
-        fetchStockOnHand(stockCard, asOfDate != null ? asOfDate : LocalDate.now()));
+    // stockCards.forEach(stockCard ->
+    //     fetchStockOnHand(stockCard, asOfDate != null ? asOfDate : LocalDate.now()));
+    // FIX for N+1 problem above
+    fetchStockOnHandInBatch(stockCards, asOfDate != null ? asOfDate : LocalDate.now());
+
 
     return lotCodeIds.isEmpty()
             ? stockCards
@@ -324,4 +327,37 @@ public class CalculatedStockOnHandService {
         new Message(ERROR_EVENT_DEBIT_QUANTITY_EXCEED_SOH,
             item.getOccurredDate(), code, prevSoH, item.getQuantity()));
   }
+
+  /**
+   * Fetch stock on hand for a list of stock cards in batch.
+   *
+   * @param stockCards list of stock cards to fetch stock on hand for
+   * @param asOfDate   date used to get latest stock on hand before or equal specific date
+   */
+  @Transactional
+  public void fetchStockOnHandInBatch(List<StockCard> stockCards, LocalDate asOfDate) {
+    List<UUID> stockCardIds = stockCards.stream()
+        .map(StockCard::getId)
+        .collect(Collectors.toList());
+
+    Map<UUID, CalculatedStockOnHand> sohMap =
+        calculatedStockOnHandRepository
+            .findByStockCardIdInAndOccurredDateLessThanEqual(stockCardIds, asOfDate)
+            .stream()
+            .collect(Collectors.toMap(
+                soh -> soh.getStockCard().getId(),
+                soh -> soh,
+                (soh1, soh2) -> soh1.getOccurredDate().isAfter(soh2.getOccurredDate()) ? soh1 : soh2
+            ));
+
+    for (StockCard card : stockCards) {
+      CalculatedStockOnHand soh = sohMap.get(card.getId());
+      if (soh != null) {
+        card.setStockOnHand(soh.getStockOnHand());
+        card.setOccurredDate(soh.getOccurredDate());
+        card.setProcessedDate(soh.getProcessedDate());
+      }
+    }
+  }
+
 }
