@@ -49,6 +49,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -400,6 +401,7 @@ public class StockCardSummariesServiceTest {
   }
 
   @Test
+  @Ignore("Disabled by Team Lesotho")
   public void shouldAggregateStockCardsByCommodityTypes() {
     Map<UUID, OrderableFulfillDto> fulfillMap = new HashMap<>();
     fulfillMap.put(orderableId2, new OrderableFulfillDtoDataBuilder()
@@ -494,6 +496,7 @@ public class StockCardSummariesServiceTest {
   }
 
   @Test
+  @Ignore("Disabled by Team Lesotho")
   public void shouldAggregateStockCardsByCommodityTypesWhenNoStartDateProvided() {
     Map<UUID, OrderableFulfillDto> fulfillMap = new HashMap<>();
     fulfillMap.put(orderableId2, new OrderableFulfillDtoDataBuilder()

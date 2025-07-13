@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -114,39 +115,124 @@ public class StockCardSummariesService extends StockCardBaseService {
    * @param orderableIds collection of unique orderable UUIDs
    * @return map of stock cards assigned to orderable ids
    */
+  // public Map<UUID, StockCardAggregate> getGroupedStockCards(UUID programId,
+  //                                                           UUID facilityId,
+  //                                                           Set<UUID> orderableIds,
+  //                                                           LocalDate startDate,
+  //                                                           LocalDate endDate) {
+  //   Profiler profiler = new Profiler("GET_GROUPED_STOCK_CARDS"); 
+  //   profiler.setLogger(LOGGER);
+
+  //   profiler.start("GET_STOCK_CARDS_WITH_STOCK_ON_HAND");                                                     
+  //   List<StockCard> stockCards = calculatedStockOnHandService
+  //       .getStockCardsWithStockOnHand(programId, facilityId);
+
+  //   profiler.start("ORDERABLE_FULFILL_MAP");    
+  //   Map<UUID, OrderableFulfillDto> orderableFulfillMap =
+  //       orderableFulfillService.findByIds(stockCards.stream()
+  //           .map(StockCard::getOrderableId)
+  //           .collect(toSet()));
+
+  //   profiler.start("GROUP_STOCK_CARDS_BY_ORDERABLE");        
+  //   Map<UUID, StockCardAggregate> groupedCards =  stockCards.stream()
+  //       .map(stockCard -> assignOrderableToStockCard(
+  //           stockCard, orderableFulfillMap, orderableIds, startDate, endDate))
+  //       .filter(pair -> null != pair.getLeft())
+  //       .collect(toMap(
+  //           ImmutablePair::getLeft,
+  //           ImmutablePair::getRight,
+  //           (StockCardAggregate aggregate1, StockCardAggregate aggregate2) -> {
+  //             aggregate1.getStockCards().addAll(aggregate2.getStockCards());
+  //             return aggregate1;
+  //           }));
+  //   profiler.stop().log();
+  //   return groupedCards;
+  // }
+
+  /**
+   * Get a map of stock cards assigned to orderable ids.
+   * Stock cards are grouped using orderable fulfills endpoint.
+   * If there is no orderable that can be fulfilled by stock card its orderable id will be used.
+   *
+   * @param programId    UUID of the program
+   * @param facilityId   UUID of the facility
+   * @param orderableIds collection of unique orderable UUIDs
+   * @return map of stock cards assigned to orderable ids
+   */
   public Map<UUID, StockCardAggregate> getGroupedStockCards(UUID programId,
-                                                            UUID facilityId,
-                                                            Set<UUID> orderableIds,
-                                                            LocalDate startDate,
-                                                            LocalDate endDate) {
-    Profiler profiler = new Profiler("GET_GROUPED_STOCK_CARDS"); 
+                                                           UUID facilityId,
+                                                           Set<UUID> orderableIds,
+                                                           LocalDate startDate,
+                                                           LocalDate endDate) {
+    Profiler profiler = new Profiler("GET_GROUPED_STOCK_CARDS");
     profiler.setLogger(LOGGER);
 
-    profiler.start("GET_STOCK_CARDS_WITH_STOCK_ON_HAND");                                                     
+    profiler.start("GET_STOCK_CARDS_WITH_STOCK_ON_HAND");
     List<StockCard> stockCards = calculatedStockOnHandService
         .getStockCardsWithStockOnHand(programId, facilityId);
 
-    profiler.start("ORDERABLE_FULFILL_MAP");    
-    Map<UUID, OrderableFulfillDto> orderableFulfillMap =
-        orderableFulfillService.findByIds(stockCards.stream()
+    profiler.start("ORDERABLE_FULFILL_MAP");
+    Map<UUID, OrderableFulfillDto> orderableFulfillMap = orderableFulfillService.findByIds(
+        stockCards.stream()
             .map(StockCard::getOrderableId)
-            .collect(toSet()));
+            .collect(toSet())
+    );
 
-    profiler.start("GROUP_STOCK_CARDS_BY_ORDERABLE");        
-    Map<UUID, StockCardAggregate> groupedCards =  stockCards.stream()
-        .map(stockCard -> assignOrderableToStockCard(
-            stockCard, orderableFulfillMap, orderableIds, startDate, endDate))
-        .filter(pair -> null != pair.getLeft())
-        .collect(toMap(
-            ImmutablePair::getLeft,
-            ImmutablePair::getRight,
-            (StockCardAggregate aggregate1, StockCardAggregate aggregate2) -> {
-              aggregate1.getStockCards().addAll(aggregate2.getStockCards());
-              return aggregate1;
-            }));
+    profiler.start("GROUP_STOCK_CARDS_BY_ORDERABLE");
+
+    // Flatten all card IDs
+    Set<UUID> stockCardIds = stockCards.stream()
+        .map(StockCard::getId)
+        .collect(toSet());
+
+    // Query all Calculated SOH
+    List<CalculatedStockOnHand> calculatedSoh;
+    if (startDate == null) {
+      calculatedSoh = calculatedStockOnHandRepository
+          .findByStockCardIdInAndOccurredDateLessThanEqual(stockCardIds, endDate);
+      calculatedSoh.addAll(calculatedStockOnHandRepository
+          .findLatestSohByStockCardIdIn(stockCardIds, endDate));
+    } else {
+      calculatedSoh = calculatedStockOnHandRepository
+          .findByStockCardIdInAndOccurredDateBetween(stockCardIds, startDate, endDate);
+      calculatedSoh.addAll(calculatedStockOnHandRepository
+          .findLatestSohByStockCardIdIn(stockCardIds, startDate));
+    }
+
+    // Index SOHs by stockCardId
+    Map<UUID, List<CalculatedStockOnHand>> sohByStockCardId = calculatedSoh.stream()
+        .collect(Collectors.groupingBy(soh -> soh.getStockCard().getId()));
+
+    // Now construct the final grouped map
+    Map<UUID, StockCardAggregate> grouped = new HashMap<>();
+    for (StockCard stockCard : stockCards) {
+      // Determine the grouping ID (fulfilled-by or original)
+      UUID groupingOrderableId = Optional.ofNullable(orderableFulfillMap.get(stockCard.getOrderableId()))
+          .map(OrderableFulfillDto::getCanBeFulfilledByMe)
+          .filter(list -> !list.isEmpty())
+          .map(list -> list.get(0))
+          .orElse(stockCard.getOrderableId());
+
+      if (orderableIds != null && !orderableIds.contains(groupingOrderableId)) {
+        // Skip stock cards that do not match the provided orderable IDs
+        continue;
+      }
+
+      grouped.computeIfAbsent(groupingOrderableId,
+          id -> new StockCardAggregate(new ArrayList<>(), new ArrayList<>()))
+          .getStockCards().add(stockCard);
+
+      List<CalculatedStockOnHand> sohs =
+          sohByStockCardId.getOrDefault(stockCard.getId(), Collections.emptyList());
+
+      grouped.get(groupingOrderableId).getCalculatedStockOnHands().addAll(sohs);
+    }
+
     profiler.stop().log();
-    return groupedCards;
+    return grouped;
   }
+
+
 
   /**
    * Get a page of stock cards.

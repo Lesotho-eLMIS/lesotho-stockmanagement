@@ -19,9 +19,11 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.openlmis.stockmanagement.domain.event.CalculatedStockOnHand;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CalculatedStockOnHandRepository
@@ -45,4 +47,11 @@ public interface CalculatedStockOnHandRepository
   List<CalculatedStockOnHand>
       findByStockCardIdInAndOccurredDateLessThanEqual(
         Collection<UUID> stockCardId, LocalDate endDate);
+
+  @Query("SELECT c FROM CalculatedStockOnHand c WHERE c.occurredDate = "
+       + "(SELECT MAX(c2.occurredDate) FROM CalculatedStockOnHand c2 " 
+       + "WHERE c2.stockCard.id = c.stockCard.id AND c2.occurredDate <= :asOfDate) "
+       + "AND c.stockCard.id IN :stockCardIds")
+  List<CalculatedStockOnHand> findLatestSohByStockCardIdIn(@Param("stockCardIds") Set<UUID> stockCardIds,
+                                                          @Param("asOfDate") LocalDate asOfDate);
 }
