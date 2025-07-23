@@ -15,7 +15,9 @@
 
 package org.openlmis.stockmanagement.web.stockcardrangesummary;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.openlmis.stockmanagement.service.PermissionService;
 import org.openlmis.stockmanagement.service.StockCardAggregate;
@@ -29,6 +31,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -83,6 +87,48 @@ public class StockCardRangeSummaryController {
         params.getTag(),
         params.getStartDate(),
         params.getEndDate(),
+        pageable);
+
+    profiler.stop().log();
+    return page;
+  }
+
+  /**
+   * Get stock card range summaries by program and facility.
+   * This endpoint is used to post a request body instead of query parameters.
+   * It is useful for complex queries where the number of parameters may exceed URL length limits.
+   *
+   * @return Stock card range summaries.
+   */
+  @PostMapping
+  public Page<StockCardRangeSummaryDto> postStockCardRangeSummaries(
+      @RequestBody StockCardRangeSummaryPostRequest request,
+      @PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
+
+    Profiler profiler = new Profiler("POST_STOCK_CARD_RANGE_SUMMARIES");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("PERMISSION_CHECK");
+    permissionService.canViewStockCard(request.getProgramId(), request.getFacilityId());
+
+    profiler.start("GET_STOCK_CARDS_SUMMARIES_SERVICE");
+    Set<UUID> orderableIdSet = request.getOrderableIds() != null
+        ? new HashSet<>(request.getOrderableIds())
+        : null;
+    Map<UUID, StockCardAggregate> groupedStockCards =
+        stockCardSummariesService.getGroupedStockCards(
+            request.getProgramId(),
+            request.getFacilityId(),
+            orderableIdSet,
+            request.getStartDate(),
+            request.getEndDate());
+
+    profiler.start("TO_DTO");
+    Page<StockCardRangeSummaryDto> page = builder.build(
+        groupedStockCards,
+        request.getTag(),
+        request.getStartDate(),
+        request.getEndDate(),
         pageable);
 
     profiler.stop().log();
