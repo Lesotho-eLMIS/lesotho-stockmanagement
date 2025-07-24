@@ -20,6 +20,7 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.UUID;
 import org.openlmis.stockmanagement.dto.referencedata.ApprovedProductDto;
 import org.openlmis.stockmanagement.dto.referencedata.OrderablesAggregator;
@@ -102,4 +103,58 @@ public class ApprovedProductReferenceDataService extends
 
     return new OrderablesAggregator(new ArrayList<>(approvedProductPage.getContent()));
   }
+
+  /**
+   * Retrieves all facility approved products from the reference data service, based on the
+   * provided facility and full supply flag. It can be optionally filtered by the program ID.
+   * The result is wrapped to a separate class to improve the performance
+   *
+   * @param facilityId id of the facility
+   * @param programIds  ids of the program
+   * @param orderableIds ids of orderables
+   * @param orderableCode Code of the orderables
+   * @param orderableName Name of the orderables
+   *
+   * @return wrapped collection of approved products matching the search criteria
+   */
+  public OrderablesAggregator postApprovedProducts(
+    UUID facilityId,
+    Collection<UUID> programIds,
+    Collection<UUID> orderableIds,
+    String orderableCode,
+    String orderableName
+  ) {
+    // Build the body
+    ApprovedProductQueryDto query = new ApprovedProductQueryDto();
+
+    if (!isEmpty(programIds)) {
+      query.setProgramId(programIds);
+    }
+
+    if (!isEmpty(orderableIds)) {
+      query.setOrderableId(orderableIds);
+    }
+
+    if (orderableCode != null) {
+      query.setOrderableCode(orderableCode);
+    }
+
+    if (orderableName != null) {
+      query.setOrderableName(orderableName);
+    }
+
+    HashMap<String, Object> params = new HashMap<>();
+    params.put("size", Integer.MAX_VALUE);
+
+    // POST call
+    Page<ApprovedProductDto> approvedProductPage = getPage(
+        facilityId + "/approvedProducts/search",
+        params,
+        query
+    );
+
+    return new OrderablesAggregator(new ArrayList<>(approvedProductPage.getContent()));
+  }
+
+
 }
