@@ -46,8 +46,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
@@ -295,6 +297,31 @@ public abstract class BaseCommunicationService<T> {
         .withDefaultValue(Collections::emptyMap)
         .merge();
   }
+
+  protected <K, V, B> Map<K, V> postMap(
+    String resourceUrl,
+    B requestBody,
+    Class<K> keyType,
+    Class<V> valueType
+  ) {
+    String url = getServiceUrl() + getUrl() + StringUtils.defaultIfBlank(resourceUrl, "");
+    TypeFactory factory = objectMapper.getTypeFactory();
+    MapType mapType = factory.constructMapType(HashMap.class, keyType, valueType);
+
+    HttpHeaders headers = createHeadersWithAuth().toHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<B> entity = new HttpEntity<>(requestBody, headers);
+
+    ResponseEntity<Map> response = restTemplate.exchange(
+        url,
+        HttpMethod.POST,
+        entity,
+        Map.class
+    );
+
+    return objectMapper.convertValue(response.getBody(), mapType);
+  }
+
 
   private <E> ResponseEntity<E[]> doListRequest(String url, RequestParameters parameters,
                                                 HttpMethod method, Class<E[]> type) {

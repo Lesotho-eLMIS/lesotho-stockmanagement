@@ -16,8 +16,12 @@
 package org.openlmis.stockmanagement.service.referencedata;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.openlmis.stockmanagement.dto.referencedata.OrderableFulfillDto;
 import org.openlmis.stockmanagement.util.RequestParameters;
 import org.springframework.stereotype.Service;
@@ -53,4 +57,27 @@ public class OrderableFulfillReferenceDataService extends BaseReferenceDataServi
 
     return getMap(null, parameters, UUID.class, OrderableFulfillDto.class);
   }
+
+  /**
+   * Finds orderables by their ids using POST request.
+   *
+   * @param ids ids to look for.
+   * @return a map of orderables
+   */
+  public Map<UUID, OrderableFulfillDto> findByIdsPost(Collection<UUID> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return new HashMap<>();
+    }
+
+    List<String> orderableIdStrings = ids.stream()
+        .map(UUID::toString)
+        .collect(Collectors.toList());
+
+    OrderableFulfillQueryDto requestBody = new OrderableFulfillQueryDto();
+    requestBody.setOrderableIds(orderableIdStrings);
+
+    return postMap(null, requestBody, UUID.class, OrderableFulfillDto.class);
+  }
+
+
 }

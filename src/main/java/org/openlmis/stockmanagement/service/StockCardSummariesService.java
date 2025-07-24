@@ -128,7 +128,7 @@ public class StockCardSummariesService extends StockCardBaseService {
 
     profiler.start("ORDERABLE_FULFILL_MAP");    
     Map<UUID, OrderableFulfillDto> orderableFulfillMap =
-        orderableFulfillService.findByIds(stockCards.stream()
+        orderableFulfillService.findByIdsPost(stockCards.stream()
             .map(StockCard::getOrderableId)
             .collect(toSet()));
 
@@ -162,7 +162,7 @@ public class StockCardSummariesService extends StockCardBaseService {
 
     profiler.start("GET_APPROVED_PRODUCTS");
     OrderablesAggregator approvedProducts = approvedProductReferenceDataService
-        .getApprovedProducts(params.getFacilityId(), params.getProgramIds(),
+        .postApprovedProducts(params.getFacilityId(), params.getProgramIds(),
             params.getOrderableIds(), params.getOrderableCode(), params.getOrderableName());
 
     if (!authentication.isClientOnly() && !homeFacilityPermissionService
@@ -174,7 +174,7 @@ public class StockCardSummariesService extends StockCardBaseService {
     }
 
     profiler.start("FIND_ORDERABLE_FULFILL_BY_ID");
-    Map<UUID, OrderableFulfillDto> orderableFulfillMap = orderableFulfillService.findByIds(
+    Map<UUID, OrderableFulfillDto> orderableFulfillMap = orderableFulfillService.findByIdsPost(
         approvedProducts.getIdentifiers());
 
     profiler.start("FIND_STOCK_CARD_BY_PROGRAM_AND_FACILITY");
