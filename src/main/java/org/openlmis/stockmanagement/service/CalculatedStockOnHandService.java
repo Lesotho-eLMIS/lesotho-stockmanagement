@@ -15,6 +15,7 @@
 
 package org.openlmis.stockmanagement.service;
 
+import static java.util.Collections.singletonList;
 import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_EVENT_DEBIT_QUANTITY_EXCEED_SOH;
 
 import java.time.LocalDate;
@@ -44,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@SuppressWarnings("PMD.TooManyMethods")
 public class CalculatedStockOnHandService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CalculatedStockOnHandService.class);
@@ -60,7 +62,7 @@ public class CalculatedStockOnHandService {
   /**
    * Returns list of stock cards with fetched Stock on Hand values.
    *
-   * @param programId  program id to find stock cards
+   * @param programIds  program id to find stock cards
    * @param facilityId facility id to find stock cards
    * @param asOfDate   date used to get latest stock on hand before or equal specific date
    * @param orderableIds  orderable ids to find stock card
@@ -68,16 +70,17 @@ public class CalculatedStockOnHandService {
    * @return List of stock cards with SOH values, empty list if no stock cards were found.
    */
   public List<StockCard> getStockCardsWithStockOnHand(
-          UUID programId, UUID facilityId, LocalDate asOfDate, List<UUID> orderableIds,
+          List<UUID> programIds, UUID facilityId, LocalDate asOfDate, List<UUID> orderableIds,
           Set<UUID> lotCodeIds) {
 
-    List<StockCard> stockCards = orderableIds.isEmpty()
-        ? stockCardRepository.findByProgramIdAndFacilityId(programId, facilityId)
-        : stockCardRepository.findByOrderableIdInAndProgramIdAndFacilityId(
-        orderableIds, programId, facilityId);
+    List<StockCard> stockCards = findStockCards(facilityId, orderableIds, programIds);
 
-    stockCards.forEach(stockCard ->
-        fetchStockOnHand(stockCard, asOfDate != null ? asOfDate : LocalDate.now()));
+    // FIXME: This most likely could be done as one SQL
+    // stockCards.forEach(stockCard ->
+    //     fetchStockOnHand(stockCard, asOfDate != null ? asOfDate : LocalDate.now()));
+    // FIX for N+1 problem above
+    fetchStockOnHandInBatch(stockCards, asOfDate != null ? asOfDate : LocalDate.now());
+
 
     return lotCodeIds.isEmpty()
             ? stockCards
@@ -122,7 +125,7 @@ public class CalculatedStockOnHandService {
   public List<StockCard> getStockCardsWithStockOnHand(
           UUID programId, UUID facilityId, LocalDate asOfDate, List<UUID> orderableIds) {
 
-    return getStockCardsWithStockOnHand(programId, facilityId,
+    return getStockCardsWithStockOnHand(singletonList(programId), facilityId,
             asOfDate, orderableIds, Collections.emptySet());
   }
 
@@ -212,6 +215,23 @@ public class CalculatedStockOnHandService {
       lineItemsPreviousStockOnHand = calculatedStockOnHand;
     }
     profiler.stop().log();
+  }
+
+  private List<StockCard> findStockCards(UUID facilityId,
+      List<UUID> orderableIds,
+      List<UUID> programIds) {
+
+    if ((orderableIds == null || orderableIds.isEmpty()) && (programIds == null || programIds
+        .isEmpty())) {
+      return stockCardRepository.findByFacilityId(facilityId);
+    } else if (orderableIds == null || orderableIds.isEmpty()) {
+      return stockCardRepository.findByFacilityIdAndProgramIdIn(facilityId, programIds);
+    } else if (programIds == null || programIds.isEmpty()) {
+      return stockCardRepository.findByFacilityIdAndOrderableIdIn(facilityId, orderableIds);
+    } else {
+      return stockCardRepository
+          .findByFacilityIdAndOrderableIdInAndProgramIdIn(facilityId, orderableIds, programIds);
+    }
   }
 
   private int getPreviousStockOnHand(StockCard stockCard, StockCardLineItem lineItem) {
@@ -307,4 +327,37 @@ public class CalculatedStockOnHandService {
         new Message(ERROR_EVENT_DEBIT_QUANTITY_EXCEED_SOH,
             item.getOccurredDate(), code, prevSoH, item.getQuantity()));
   }
+
+  /**
+   * Fetch stock on hand for a list of stock cards in batch.
+   *
+   * @param stockCards list of stock cards to fetch stock on hand for
+   * @param asOfDate   date used to get latest stock on hand before or equal specific date
+   */
+  @Transactional
+  public void fetchStockOnHandInBatch(List<StockCard> stockCards, LocalDate asOfDate) {
+    List<UUID> stockCardIds = stockCards.stream()
+        .map(StockCard::getId)
+        .collect(Collectors.toList());
+
+    Map<UUID, CalculatedStockOnHand> sohMap =
+        calculatedStockOnHandRepository
+            .findByStockCardIdInAndOccurredDateLessThanEqual(stockCardIds, asOfDate)
+            .stream()
+            .collect(Collectors.toMap(
+                soh -> soh.getStockCard().getId(),
+                soh -> soh,
+                (soh1, soh2) -> soh1.getOccurredDate().isAfter(soh2.getOccurredDate()) ? soh1 : soh2
+            ));
+
+    for (StockCard card : stockCards) {
+      CalculatedStockOnHand soh = sohMap.get(card.getId());
+      if (soh != null) {
+        card.setStockOnHand(soh.getStockOnHand());
+        card.setOccurredDate(soh.getOccurredDate());
+        card.setProcessedDate(soh.getProcessedDate());
+      }
+    }
+  }
+
 }

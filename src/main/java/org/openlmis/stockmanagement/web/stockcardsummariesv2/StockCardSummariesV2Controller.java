@@ -29,6 +29,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -78,4 +80,49 @@ public class StockCardSummariesV2Controller {
     profiler.stop().log();
     return page;
   }
+
+  /**
+   * Get stock card summaries by program and facility.
+   * This endpoint is used to post a request body instead of query parameters.
+   * It is useful for complex queries where the number of parameters may exceed URL length limits.
+   *
+   * @return Stock card summaries.
+   */
+  @PostMapping
+  public Page<StockCardSummaryV2Dto> postStockCardSummaries(
+      @RequestBody StockCardSummariesV2PostRequest request,
+      @PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
+
+    Profiler profiler = new Profiler("POST_STOCK_CARDS_V2");
+    profiler.setLogger(LOGGER);
+
+    profiler.start("MAP_REQUEST");
+    StockCardSummariesV2SearchParams params = new StockCardSummariesV2SearchParams(
+        request.getProgramIds(),
+        request.getFacilityId(),
+        request.getOrderableIds(),
+        request.getAsOfDate(),
+        request.isNonEmptyOnly(),
+        request.getOrderableCode(),
+        request.getOrderableName(),
+        request.getLotCode()
+    );
+
+    profiler.start("GET_STOCK_CARD_SUMMARIES");
+    StockCardSummaries summaries = stockCardSummariesService.findStockCards(params);
+
+    profiler.start("TO_DTO");
+    List<StockCardSummaryV2Dto> dtos = stockCardSummariesV2DtoBuilder.build(
+        summaries.getPageOfApprovedProducts(),
+        summaries.getStockCardsForFulfillOrderables(),
+        summaries.getOrderableFulfillMap(),
+        params.isNonEmptyOnly());
+
+    profiler.start("GET_PAGE");
+    Page<StockCardSummaryV2Dto> page = Pagination.getPage(dtos, pageable);
+
+    profiler.stop().log();
+    return page;
+  }
+
 }

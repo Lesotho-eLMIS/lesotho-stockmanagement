@@ -21,7 +21,10 @@ import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_PROVIDED_FACIL
 import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_PROVIDED_PROGRAM_ID_WITHOUT_FACILITY_ID;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.openlmis.stockmanagement.exception.ValidationMessageException;
 import org.openlmis.stockmanagement.util.Message;
 import org.openlmis.stockmanagement.util.UuidUtil;
@@ -31,6 +34,7 @@ public class ValidSourceDestinationSearchParams {
 
   public static final String PROGRAM_ID = "programId";
   public static final String FACILITY_ID = "facilityId";
+  public static final String GEOGRAPHIC_ZONE_ID = "geographicZoneId";
 
   private SearchParams queryParams;
 
@@ -56,6 +60,21 @@ public class ValidSourceDestinationSearchParams {
   }
 
   /**
+   * Gets all program IDs.
+   *
+   * @return list of program UUID or empty list (if params doesn't contain this param)
+   */
+  public List<UUID> getAllProgramIds() {
+    if (!queryParams.containsKey(PROGRAM_ID)) {
+      return Collections.emptyList();
+    }
+
+    return queryParams.get(PROGRAM_ID).stream()
+        .map(uuid -> UuidUtil.fromString(uuid).orElse(null))
+        .collect(Collectors.toList());
+  }
+
+  /**
    * Gets facility id.
    *
    * @return UUID value of facility id or null if params doesn't contain this param.
@@ -68,8 +87,21 @@ public class ValidSourceDestinationSearchParams {
     return UuidUtil.fromString(facilityType).orElse(null);
   }
 
+  /**
+   * Gets geographic zone id.
+   *
+   * @return UUID value of geographic zone id or null if params doesn't contain this param.
+   */
+  public UUID getGeographicZone() {
+    if (!queryParams.containsKey(GEOGRAPHIC_ZONE_ID)) {
+      return null;
+    }
+    String geographicZone = queryParams.getFirst(GEOGRAPHIC_ZONE_ID);
+    return UuidUtil.fromString(geographicZone).orElse(null);
+  }
+
   private void validate() {
-    if (!Collections.unmodifiableList(asList(PROGRAM_ID, FACILITY_ID))
+    if (!Collections.unmodifiableList(asList(PROGRAM_ID, FACILITY_ID, GEOGRAPHIC_ZONE_ID))
         .containsAll(queryParams.keySet())) {
       throw new ValidationMessageException(new Message(ERROR_INVALID_PARAMS));
     }

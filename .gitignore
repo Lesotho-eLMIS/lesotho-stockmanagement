@@ -9,4 +9,4 @@ out/
 .manual-api-test-env
 .tx/
 node_modules/
-gradlew*
+bin/
