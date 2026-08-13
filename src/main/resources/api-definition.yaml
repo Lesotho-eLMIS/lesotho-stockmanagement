@@ -557,6 +557,23 @@ traits:
               application/json:
                 schema: localizedMessage
 
+  /stockCardLineItems:
+      /referenceNumbers:
+          /search:
+              post:
+                  is: [ secured ]
+                  description: Find which of the given reference numbers are already recorded against stock at a facility.
+                  body:
+                      application/json:
+                  responses:
+                      200:
+                          body:
+                              application/json:
+                      403:
+                          description: User does not have permission to view stock cards of given facility and program.
+                          body:
+                              application/json:
+                                  schema: localizedMessage
   /stockCards:
       get:
           is: [ secured, paginated, sorted ]

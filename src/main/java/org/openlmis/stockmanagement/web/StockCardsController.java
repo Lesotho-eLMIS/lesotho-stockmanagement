@@ -17,11 +17,14 @@ package org.openlmis.stockmanagement.web;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.openlmis.stockmanagement.dto.ReferenceNumberSearchParamsDto;
 import org.openlmis.stockmanagement.dto.StockCardDto;
+import org.openlmis.stockmanagement.repository.StockCardLineItemRepository;
 import org.openlmis.stockmanagement.service.PermissionService;
 import org.openlmis.stockmanagement.service.StockCardService;
 import org.openlmis.stockmanagement.service.StockCardSummariesService;
@@ -57,6 +60,9 @@ public class StockCardsController {
 
   @Autowired
   private StockCardSummariesService stockCardSummariesService;
+
+  @Autowired
+  private StockCardLineItemRepository stockCardLineItemRepository;
 
   /**
    * Get stock card by id.
@@ -157,4 +163,27 @@ public class StockCardsController {
     stockCardService.setInactive(stockCardIds);
     LOGGER.debug("Successfully deactivated {} stock cards.", stockCardIds.size());
   }
+
+  /**
+   * Finds which of the given reference numbers are already recorded against stock at the given
+   * facility. Any reference number that is absent from the response has not yet been received
+   * into stock.
+   *
+   * @param params facility, program and the reference numbers to look for.
+   * @return the subset of the given reference numbers that were found.
+   */
+  @RequestMapping(value = "/stockCardLineItems/referenceNumbers/search",
+          method = RequestMethod.POST)
+  public List<String> searchReferenceNumbers(
+          @RequestBody ReferenceNumberSearchParamsDto params) {
+    permissionService.canViewStockCard(params.getProgramId(), params.getFacilityId());
+
+    if (isEmpty(params.getReferenceNumbers())) {
+      return Collections.emptyList();
+    }
+
+    return stockCardLineItemRepository.findExistingReferenceNumbers(
+            params.getFacilityId(), params.getReferenceNumbers());
+  }
+
 }
