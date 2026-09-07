@@ -17,6 +17,7 @@ package org.openlmis.stockmanagement.dto;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -38,12 +39,16 @@ public class StockEventLineDetailDtoTest {
   public void newInstanceShouldFlattenCardProductAndLineItemValues() {
     OrderableDto orderable = OrderableDto.builder().productCode("ABC01").build();
     FacilityDto source = FacilityDto.builder().name("Provincial WH").build();
+    FacilityDto destination = FacilityDto.builder().name("District WH").build();
     StockCardLineItemReason reason = new StockCardLineItemReasonDataBuilder().build();
     StockCardLineItem item = new StockCardLineItemDataBuilder()
         .withQuantity(7)
         .withStockOnHand(20)
         .withOccurredDate(LocalDate.of(2026, 2, 15))
         .withReason(reason)
+        .withReasonFreeText("reasonFreeText")
+        .withSourceFreeText("sourceFreeText")
+        .withDestinationFreeText("destinationFreeText")
         .withDocumentNumber("2026-02-FAC001-0001")
         .build();
 
@@ -51,17 +56,43 @@ public class StockEventLineDetailDtoTest {
     StockCardLineItemDto lineItemDto = StockCardLineItemDto.builder()
         .lineItem(item)
         .source(source)
+        .destination(destination)
         .build();
 
     StockEventLineDetailDto dto = StockEventLineDetailDto.newInstance(card, lineItemDto);
 
     assertThat(dto.getOrderable(), is(orderable));
     assertThat(dto.getSource(), is(source));
+    assertThat(dto.getDestination(), is(destination));
     assertThat(dto.getQuantity(), is(7));
     assertThat(dto.getStockOnHand(), is(20));
     assertThat(dto.getOccurredDate(), is(LocalDate.of(2026, 2, 15)));
     assertThat(dto.getReason(), is(reason));
+    assertThat(dto.getReasonFreeText(), is("reasonFreeText"));
+    assertThat(dto.getSourceFreeText(), is("sourceFreeText"));
+    assertThat(dto.getDestinationFreeText(), is("destinationFreeText"));
     assertThat(dto.getDocumentNumber(), is("2026-02-FAC001-0001"));
+  }
+
+  @Test
+  public void newInstanceShouldLeaveFreeTextsNullWhenLineItemHasNone() {
+    StockCardLineItem item = new StockCardLineItemDataBuilder()
+        .withReason(new StockCardLineItemReasonDataBuilder().build())
+        .withReasonFreeText(null)
+        .withSourceFreeText(null)
+        .withDestinationFreeText(null)
+        .build();
+
+    StockCardDto card = StockCardDto.builder()
+        .orderable(OrderableDto.builder().productCode("ABC01").build())
+        .build();
+
+    StockEventLineDetailDto dto = StockEventLineDetailDto.newInstance(card,
+        StockCardLineItemDto.builder().lineItem(item).build());
+
+    assertThat(dto.getReasonFreeText(), is(nullValue()));
+    assertThat(dto.getSourceFreeText(), is(nullValue()));
+    assertThat(dto.getDestinationFreeText(), is(nullValue()));
   }
 
   @Test

@@ -317,6 +317,42 @@ public class StockEventsServiceTest {
         .lineItems(singletonList(line)).build();
   }
 
+  @Test
+  public void findStockEventLineItemsShouldCarryFreeTextsOfTheLineItem() {
+    UUID facility = randomUUID();
+    UUID program = randomUUID();
+    StockEvent event = new StockEventDataBuilder()
+        .withFacility(facility).withProgram(program).withEventOrigin(EventOrigin.ISSUE).build();
+    UUID eventId = event.getId();
+    UUID cardId = randomUUID();
+
+    when(stockEventsRepository.findById(eventId)).thenReturn(Optional.of(event));
+    when(stockCardLineItemRepository.findStockCardIdsByOriginEvent(eventId))
+        .thenReturn(singletonList(cardId));
+
+    StockCardLineItemDto line = StockCardLineItemDto.builder()
+        .lineItem(new StockCardLineItemDataBuilder()
+            .withReasonFreeText("damaged in transit")
+            .withSourceFreeText("other warehouse")
+            .withDestinationFreeText("other clinic")
+            .build())
+        .originEventId(eventId).build();
+    StockCardDto cardDto = StockCardDto.builder()
+        .orderable(OrderableDto.builder().productCode("ABC").build())
+        .lineItems(singletonList(line)).build();
+    when(stockCardService.findStockCardsByIds(anyCollection()))
+        .thenReturn(singletonList(cardDto));
+
+    Page<StockEventLineDetailDto> result =
+        stockEventsService.findStockEventLineItems(eventId, pageable);
+
+    StockEventLineDetailDto detail = result.getContent().get(0);
+
+    assertThat(detail.getReasonFreeText(), is("damaged in transit"));
+    assertThat(detail.getSourceFreeText(), is("other warehouse"));
+    assertThat(detail.getDestinationFreeText(), is("other clinic"));
+  }
+
   @Test(expected = ResourceNotFoundException.class)
   public void findStockEventLineItemsShouldThrowWhenEventNotFound() {
     UUID eventId = randomUUID();

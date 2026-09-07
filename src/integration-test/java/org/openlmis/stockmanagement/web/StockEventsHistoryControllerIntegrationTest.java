@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -54,6 +55,7 @@ import org.springframework.test.web.servlet.ResultActions;
 public class StockEventsHistoryControllerIntegrationTest extends BaseWebTest {
 
   private static final String STOCK_EVENTS_URL = "/api/stockEvents";
+  private static final String LINE_ITEMS = "/lineItems";
   private static final String FACILITY_ID = "facilityId";
   private static final String PROGRAM_ID = "programId";
 
@@ -152,7 +154,7 @@ public class StockEventsHistoryControllerIntegrationTest extends BaseWebTest {
         .when(stockEventsService).findStockEventLineItems(eq(eventId), any(Pageable.class));
 
     ResultActions resultActions = mvc.perform(
-        get(STOCK_EVENTS_URL + "/" + eventId + "/lineItems")
+        get(STOCK_EVENTS_URL + "/" + eventId + LINE_ITEMS)
             .param(ACCESS_TOKEN, ACCESS_TOKEN_VALUE));
 
     resultActions.andExpect(status().isForbidden());
@@ -164,18 +166,46 @@ public class StockEventsHistoryControllerIntegrationTest extends BaseWebTest {
     StockEventLineDetailDto line = StockEventLineDetailDto.builder()
         .quantity(7)
         .stockOnHand(20)
+        .reasonFreeText("damaged in transit")
+        .sourceFreeText("other warehouse")
+        .destinationFreeText("other clinic")
         .build();
 
     when(stockEventsService.findStockEventLineItems(eq(eventId), any(Pageable.class)))
         .thenReturn(new PageImpl<>(singletonList(line)));
 
     ResultActions resultActions = mvc.perform(
-        get(STOCK_EVENTS_URL + "/" + eventId + "/lineItems")
+        get(STOCK_EVENTS_URL + "/" + eventId + LINE_ITEMS)
             .param(ACCESS_TOKEN, ACCESS_TOKEN_VALUE));
 
     resultActions.andExpect(status().isOk())
         .andExpect(jsonPath("$.content", hasSize(1)))
-        .andExpect(jsonPath("$.content[0].quantity", is(7)));
+        .andExpect(jsonPath("$.content[0].quantity", is(7)))
+        .andExpect(jsonPath("$.content[0].reasonFreeText", is("damaged in transit")))
+        .andExpect(jsonPath("$.content[0].sourceFreeText", is("other warehouse")))
+        .andExpect(jsonPath("$.content[0].destinationFreeText", is("other clinic")));
+  }
+
+  @Test
+  public void shouldGetStockEventLineItemsDetailWithNullFreeTexts() throws Exception {
+    UUID eventId = UUID.randomUUID();
+    StockEventLineDetailDto line = StockEventLineDetailDto.builder()
+        .quantity(7)
+        .stockOnHand(20)
+        .build();
+
+    when(stockEventsService.findStockEventLineItems(eq(eventId), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(singletonList(line)));
+
+    ResultActions resultActions = mvc.perform(
+        get(STOCK_EVENTS_URL + "/" + eventId + LINE_ITEMS)
+            .param(ACCESS_TOKEN, ACCESS_TOKEN_VALUE));
+
+    resultActions.andExpect(status().isOk())
+        .andExpect(jsonPath("$.content", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].reasonFreeText", is(nullValue())))
+        .andExpect(jsonPath("$.content[0].sourceFreeText", is(nullValue())))
+        .andExpect(jsonPath("$.content[0].destinationFreeText", is(nullValue())));
   }
 
   @Test
@@ -185,7 +215,7 @@ public class StockEventsHistoryControllerIntegrationTest extends BaseWebTest {
         .when(stockEventsService).findStockEventLineItems(eq(eventId), any(Pageable.class));
 
     ResultActions resultActions = mvc.perform(
-        get(STOCK_EVENTS_URL + "/" + eventId + "/lineItems")
+        get(STOCK_EVENTS_URL + "/" + eventId + LINE_ITEMS)
             .param(ACCESS_TOKEN, ACCESS_TOKEN_VALUE));
 
     resultActions.andExpect(status().isNotFound());
