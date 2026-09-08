@@ -16,9 +16,17 @@
       "type": ["object", "null"],
       "description": "Resolved source facility or organization, for receive line items."
     },
+    "sourceFreeText": {
+      "type": ["string", "null"],
+      "description": "Additional source free text of the movement, when present."
+    },
     "destination": {
       "type": ["object", "null"],
       "description": "Resolved destination facility or organization, for issue line items."
+    },
+    "destinationFreeText": {
+      "type": ["string", "null"],
+      "description": "Additional destination free text of the movement, when present."
     },
     "quantity": {
       "type": ["integer", "null"],
@@ -31,6 +39,10 @@
     "reason": {
       "type": ["object", "null"],
       "description": "Reason of the movement, when present."
+    },
+    "reasonFreeText": {
+      "type": ["string", "null"],
+      "description": "Additional reason free text of the movement, when present."
     },
     "stockOnHand": {
       "type": ["integer", "null"],
