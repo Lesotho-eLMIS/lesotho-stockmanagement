@@ -1,0 +1,28 @@
+execution:
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 1m
+    hold-for: 10m
+    scenario: get-stock-card-summaries-print
+
+scenarios:
+  get-stock-card-summaries-print:
+    variables:
+      # Comfort Health Clinic
+      facility_id: e6799d64-d10d-4011-b8c2-0e4d4a3f65ce
+      # Essential Meds
+      program_id: 10845cb9-d365-4aaa-badd-b4fa39c6a26a
+    requests:
+      - include-scenario: get-user-token
+      - url: ${__P(base-uri)}/api/stockCardSummaries/print?program=${program_id}&facility=${facility_id}
+        method: GET
+        label: GetStockCardSummariesPrint
+        headers:
+          Authorization: Bearer ${access_token}
+
+reporting:
+  - module: passfail
+    criteria:
+      - 'GetStockCardSummariesPrint too high error rate: failures>1%, continue as failed, label=GetStockCardSummariesPrint, title="GetStockCardSummariesPrint error rate too high"'
+      - 'GetStockCardSummariesPrint is too slow: p90>5000ms, stop as failed, label=GetStockCardSummariesPrint, title="GetStockCardSummariesPrint response time too high"'
+      - 'GetStockCardSummariesPrint needs improvement: p90>3500ms and p90<=5000ms, continue as passed, label=GetStockCardSummariesPrint, title="GetStockCardSummariesPrint needs improvement"'
