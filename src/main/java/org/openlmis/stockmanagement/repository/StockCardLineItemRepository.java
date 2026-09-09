@@ -15,10 +15,29 @@
 
 package org.openlmis.stockmanagement.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.stockmanagement.domain.card.StockCardLineItem;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface StockCardLineItemRepository
-    extends PagingAndSortingRepository<StockCardLineItem, UUID> {
+        extends PagingAndSortingRepository<StockCardLineItem, UUID> {
+
+    /**
+     * Finds which of the given reference numbers have already been recorded against stock
+     * at the given facility.
+     *
+     * @param facilityId       facility the stock cards belong to.
+     * @param referenceNumbers reference numbers to look for; must not be empty.
+     * @return the subset of referenceNumbers that were found.
+     */
+    @Query("SELECT DISTINCT li.referenceNumber FROM StockCardLineItem li "
+            + "WHERE li.stockCard.facilityId = :facilityId "
+            + "AND li.referenceNumber IN :referenceNumbers")
+    List<String> findExistingReferenceNumbers(
+            @Param("facilityId") UUID facilityId,
+            @Param("referenceNumbers") Collection<String> referenceNumbers);
 }
