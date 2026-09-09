@@ -116,6 +116,10 @@ public class JasperReportService {
   public byte[] generateStockCardSummariesReport(UUID program, UUID facility) {
     List<StockCardDto> cards = stockCardSummariesService
         .findStockCards(program, facility);
+    // Sort by product code then lot code
+    cards.sort(java.util.Comparator
+        .comparing((StockCardDto c) -> c.getOrderable().getProductCode())
+        .thenComparing(c -> c.getLot() != null ? c.getLot().getLotCode() : ""));
     StockCardDto firstCard = cards.get(0);
     Map<String, Object> params = new HashMap<>();
     params.put("stockCardSummaries", cards);
