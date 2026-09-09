@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -255,7 +256,8 @@ public class CalculatedStockOnHandService {
     return stockCard.getSortedLineItems()
         .stream()
         .filter(item -> !item.getOccurredDate().isBefore(lineItem.getOccurredDate())
-            && item.getId() != lineItem.getId()).sorted(StockCard.getLineItemsComparator())
+            && !Objects.equals(item.getId(), lineItem.getId()))
+        .sorted(StockCard.getLineItemsComparator())
         .collect(Collectors.toList());
   }
 
