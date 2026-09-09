@@ -84,7 +84,7 @@ public class StockCardLineItem extends BaseEntity {
   @Convert(converter = ExtraDataConverter.class)
   private Map<String, String> extraData;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn
   private StockCardLineItemReason reason;
 
