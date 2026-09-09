@@ -5,6 +5,7 @@ Upcoming Version (WIP)
   * Added Hibernate tuning properties: `jdbc.batch_size=20`, `default_batch_fetch_size=32` (collapses the now-lazy collection loads into batched `IN` queries).
   * Added index `phys_inv_adj_stock_event_item_idx` on `physical_inventory_line_item_adjustments(stockeventlineitemid)`, completing the foreign-key indexes on that table.
   * Reason tags are now held as an unordered set, so the `tags` array in reason payloads is no longer returned in a stable order.
+* [SELV3-874](https://openlmis.atlassian.net/browse/SELV3-874): The StockEventLineDetailDto now carries `reasonFreeText`, `sourceFreeText` and `destinationFreeText`.
 * [SELV3-873](https://openlmis.atlassian.net/browse/SELV3-873): The StockEventHistoryDto now carries `facilityId` and `programId`.
 * [SELV3-868](https://openlmis.atlassian.net/browse/SELV3-868): A cancellation is now dated on the movement it cancels rather than the current date, fixing the stockout days and consumption reported for the period. The negative-stock check is consequently stricter: stock already issued can no longer be un-received.
 * [SELV3-869](https://openlmis.atlassian.net/browse/SELV3-869): Extended `POST /api/stockEvents/{id}/cancel` to adjustment line items, reversed by an adjustment of the opposite reason type. Cancel reasons gained a scope tag (`cancelMovement` / `cancelAdjustment`) plus a `Cancelled debit adjustment` / `Cancelled credit adjustment` pair, and only line items of an issue, receive or adjustment event are cancellable.

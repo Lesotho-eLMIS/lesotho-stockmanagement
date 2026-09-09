@@ -70,6 +70,21 @@ public class StockCardLineItemDataBuilder {
     return this;
   }
 
+  public StockCardLineItemDataBuilder withReasonFreeText(String reasonFreeText) {
+    this.reasonFreeText = reasonFreeText;
+    return this;
+  }
+
+  public StockCardLineItemDataBuilder withSourceFreeText(String sourceFreeText) {
+    this.sourceFreeText = sourceFreeText;
+    return this;
+  }
+
+  public StockCardLineItemDataBuilder withDestinationFreeText(String destinationFreeText) {
+    this.destinationFreeText = destinationFreeText;
+    return this;
+  }
+
   public StockCardLineItemDataBuilder withQuantity(int newQuantity) {
     quantity = newQuantity;
     return this;

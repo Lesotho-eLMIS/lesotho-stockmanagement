@@ -36,10 +36,13 @@ public class StockEventLineDetailDto {
   private OrderableDto orderable;
   private LotDto lot;
   private FacilityDto source;
+  private String sourceFreeText;
   private FacilityDto destination;
+  private String destinationFreeText;
   private Integer quantity;
   private LocalDate occurredDate;
   private StockCardLineItemReason reason;
+  private String reasonFreeText;
   private Integer stockOnHand;
   private String documentNumber;
 
@@ -70,10 +73,13 @@ public class StockEventLineDetailDto {
         .orderable(card.getOrderable())
         .lot(card.getLot())
         .source(lineItem.getSource())
+        .sourceFreeText(item.getSourceFreeText())
         .destination(lineItem.getDestination())
+        .destinationFreeText(item.getDestinationFreeText())
         .quantity(item.getQuantity())
         .occurredDate(item.getOccurredDate())
         .reason(item.getReason())
+        .reasonFreeText(item.getReasonFreeText())
         .stockOnHand(item.getStockOnHand())
         .documentNumber(item.getDocumentNumber())
         .reversedEventId(lineItem.getReversedEventId())
