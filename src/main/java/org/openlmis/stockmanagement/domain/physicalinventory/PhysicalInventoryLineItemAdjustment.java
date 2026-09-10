@@ -15,6 +15,7 @@
 
 package org.openlmis.stockmanagement.domain.physicalinventory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -40,19 +41,26 @@ import org.openlmis.stockmanagement.dto.physicalinventory.PhysicalInventoryLineI
 @AllArgsConstructor
 public class PhysicalInventoryLineItemAdjustment extends BaseEntity {
 
+  // The three parent back-references below exist only so the owning side writes the FK; they
+  // are not part of any response. Leaving them visible to Jackson makes
+  // parent -> adjustment -> parent recurse without end.
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "stockeventlineitemid")
   private StockEventLineItem stockEventLineItem;
 
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "stockcardlineitemid")
   private StockCardLineItem stockCardLineItem;
 
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "physicalinventorylineitemid")
   private PhysicalInventoryLineItem physicalInventoryLineItem;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  // Eager on purpose: serialized inside every adjustment
+  @ManyToOne
   @JoinColumn(name = "reasonId", nullable = false)
   private StockCardLineItemReason reason;
 
