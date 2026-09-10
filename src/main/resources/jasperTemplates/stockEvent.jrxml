@@ -409,8 +409,11 @@ ORDER BY o.code, l.lotcode NULLS FIRST, rs.rn DESC
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{source} == null ? "" : $F{source}) +
-				    ($F{sourcefreetext} == null || $F{sourcefreetext}.isEmpty() ? "" : " (" + $F{sourcefreetext} + ")")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{source} == null || $F{source}.isEmpty()
+				    ? ($F{sourcefreetext} == null || $F{sourcefreetext}.isEmpty() ? "" : $F{sourcefreetext})
+				    : ($F{sourcefreetext} == null || $F{sourcefreetext}.isEmpty()
+				        ? $F{source}
+				        : msg($R{report.pattern.labelledValue}, $F{source}, $F{sourcefreetext}))]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
 				<reportElement stretchType="RelativeToBandHeight" x="330" y="0" width="160" height="22" uuid="c649aa2d-900a-4d7f-94f7-0d072c516c2a"/>
@@ -423,8 +426,11 @@ ORDER BY o.code, l.lotcode NULLS FIRST, rs.rn DESC
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{destination} == null ? "" : $F{destination}) +
-				    ($F{destinationfreetext} == null || $F{destinationfreetext}.isEmpty() ? "" : " (" + $F{destinationfreetext} + ")")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{destination} == null || $F{destination}.isEmpty()
+				    ? ($F{destinationfreetext} == null || $F{destinationfreetext}.isEmpty() ? "" : $F{destinationfreetext})
+				    : ($F{destinationfreetext} == null || $F{destinationfreetext}.isEmpty()
+				        ? $F{destination}
+				        : msg($R{report.pattern.labelledValue}, $F{destination}, $F{destinationfreetext}))]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
 				<reportElement stretchType="RelativeToBandHeight" x="490" y="0" width="190" height="22" uuid="a7672f9a-30bd-4bf9-96af-324baa7e2280"/>
@@ -437,8 +443,11 @@ ORDER BY o.code, l.lotcode NULLS FIRST, rs.rn DESC
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{reasonname} == null ? "" : $F{reasonname}) +
-				    ($F{reasonfreetext} == null || $F{reasonfreetext}.isEmpty() ? "" : " (" + $F{reasonfreetext} + ")")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{reasonname} == null || $F{reasonname}.isEmpty()
+				    ? ($F{reasonfreetext} == null || $F{reasonfreetext}.isEmpty() ? "" : $F{reasonfreetext})
+				    : ($F{reasonfreetext} == null || $F{reasonfreetext}.isEmpty()
+				        ? $F{reasonname}
+				        : msg($R{report.pattern.labelledValue}, $F{reasonname}, $F{reasonfreetext}))]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
 				<reportElement stretchType="RelativeToBandHeight" x="680" y="0" width="70" height="22" uuid="a2c8fc54-7cdc-442a-9ced-608a01ef270b"/>

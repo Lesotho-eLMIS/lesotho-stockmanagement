@@ -293,7 +293,11 @@
 								<reportElement x="0" y="0" width="63" height="30" uuid="f0f02791-44c8-44d8-96e0-15d78068606b"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$F{sourceFreeText} != null ? java.text.MessageFormat.format("{0} : {1}", $F{source} != null ? ((java.util.Map)$F{source}).get("name") : "", $F{sourceFreeText}) : ($F{source} != null ? ((java.util.Map)$F{source}).get("name") : "")]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{source} == null || ((java.util.Map)$F{source}).get("name") == null
+									? ($F{sourceFreeText} == null || $F{sourceFreeText}.isEmpty() ? "" : $F{sourceFreeText})
+									: ($F{sourceFreeText} == null || $F{sourceFreeText}.isEmpty()
+										? String.valueOf(((java.util.Map)$F{source}).get("name"))
+										: msg($R{report.pattern.labelledValue}, ((java.util.Map)$F{source}).get("name"), $F{sourceFreeText}))]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
@@ -312,7 +316,11 @@
 								<reportElement x="0" y="0" width="63" height="30" uuid="45281874-eba8-42a9-824b-62e4b04cdf75"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$F{destinationFreeText} != null ? java.text.MessageFormat.format("{0} : {1}", $F{destination} != null ? ((java.util.Map)$F{destination}).get("name") : "", $F{destinationFreeText}) : ($F{destination} != null ? ((java.util.Map)$F{destination}).get("name") : "")]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{destination} == null || ((java.util.Map)$F{destination}).get("name") == null
+									? ($F{destinationFreeText} == null || $F{destinationFreeText}.isEmpty() ? "" : $F{destinationFreeText})
+									: ($F{destinationFreeText} == null || $F{destinationFreeText}.isEmpty()
+										? String.valueOf(((java.util.Map)$F{destination}).get("name"))
+										: msg($R{report.pattern.labelledValue}, ((java.util.Map)$F{destination}).get("name"), $F{destinationFreeText}))]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
@@ -331,7 +339,11 @@
 								<reportElement x="0" y="0" width="63" height="30" uuid="2237b77f-d8d1-40c8-9a3c-350b740eecd2"/>
 								<box padding="2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$F{reasonFreeText} != null ? java.text.MessageFormat.format("{0} : {1}", $F{reason} != null ? ((java.util.Map)$F{reason}).get("name") : "", $F{reasonFreeText}) : ($F{reason} != null ? ((java.util.Map)$F{reason}).get("name") : "")]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{reason} == null || ((java.util.Map)$F{reason}).get("name") == null
+									? ($F{reasonFreeText} == null || $F{reasonFreeText}.isEmpty() ? "" : $F{reasonFreeText})
+									: ($F{reasonFreeText} == null || $F{reasonFreeText}.isEmpty()
+										? String.valueOf(((java.util.Map)$F{reason}).get("name"))
+										: msg($R{report.pattern.labelledValue}, ((java.util.Map)$F{reason}).get("name"), $F{reasonFreeText}))]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
