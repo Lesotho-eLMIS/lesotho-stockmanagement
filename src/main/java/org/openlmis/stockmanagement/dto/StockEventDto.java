@@ -59,6 +59,7 @@ public class StockEventDto {
 
   private List<StockEventLineItemDto> lineItems;
 
+  @JsonIgnore
   private StockEventProcessContext context;
 
   public boolean isActive() {

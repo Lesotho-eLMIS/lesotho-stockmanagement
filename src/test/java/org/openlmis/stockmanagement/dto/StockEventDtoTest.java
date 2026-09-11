@@ -24,6 +24,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.junit.Test;
@@ -31,6 +33,7 @@ import org.openlmis.stockmanagement.domain.event.StockEvent;
 import org.openlmis.stockmanagement.domain.event.StockEventLineItem;
 import org.openlmis.stockmanagement.testutils.StockEventDtoDataBuilder;
 import org.openlmis.stockmanagement.testutils.StockEventLineItemDtoDataBuilder;
+import org.openlmis.stockmanagement.util.LazyList;
 import org.openlmis.stockmanagement.util.LazyResource;
 import org.openlmis.stockmanagement.util.StockEventProcessContext;
 
@@ -119,5 +122,22 @@ public class StockEventDtoTest {
     boolean response = stockEventDto.isKitUnpacking();
 
     assertTrue(response);
+  }
+
+  @Test
+  public void shouldNotSerializeTheInternalProcessingContext() throws Exception {
+    StockEventProcessContext context = new StockEventProcessContext();
+    context.setSources(new LazyList<>(() -> {
+      throw new AssertionError("Jackson must not resolve the processing context");
+    }));
+
+    StockEventDto event = new StockEventDtoDataBuilder().build();
+    event.setContext(context);
+
+    String json = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .writeValueAsString(event);
+
+    assertThat(new ObjectMapper().readTree(json).has("context"), is(false));
   }
 }
