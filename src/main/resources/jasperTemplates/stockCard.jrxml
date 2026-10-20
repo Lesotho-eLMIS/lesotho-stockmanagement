@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.4.3.final using JasperReports Library version 6.4.3  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StockCard" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="d0829c7a-bf73-4e6e-9b5a-1735ab6c4d7d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StockCard" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" whenResourceMissingType="Empty" uuid="d0829c7a-bf73-4e6e-9b5a-1735ab6c4d7d">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -13,8 +13,13 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<import value="org.openlmis.stockmanagement.domain.card.*"/>
 	<import value="org.openlmis.stockmanagement.dto.*"/>
+	<import value="java.io.ByteArrayInputStream"/>
+	<import value="java.util.Base64"/>
+	<import value="java.awt.Image"/>
+	<import value="javax.imageio.ImageIO"/>
 	<import value="java.time.LocalDate"/>
 	<import value="java.time.format.DateTimeFormatter"/>
+	<import value="java.time.ZonedDateTime"/>
 	<import value="java.text.DecimalFormat"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
@@ -43,6 +48,18 @@
 			<bottomPen lineWidth="0.5" lineColor="#000000"/>
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
+	</style>
+	<style name="TableHeader" mode="Opaque" backcolor="#34495E" forecolor="#FFFFFF"
+	 fontName="SansSerif" fontSize="7" isBold="true" hTextAlign="Center" vTextAlign="Middle">
+	 <box><pen lineWidth="0.5" lineColor="#FFFFFF"/></box>
+	</style>
+	<style name="TableCell" mode="Opaque" backcolor="#FFFFFF" forecolor="#1F2933"
+	 fontName="SansSerif" fontSize="7" hTextAlign="Center" vTextAlign="Middle">
+	 <box><pen lineWidth="0.3" lineColor="#C8D2DC"/></box>
+	 <conditionalStyle>
+	  <conditionExpression><![CDATA[$V{REPORT_COUNT}.intValue() % 2 == 0]]></conditionExpression>
+	  <style backcolor="#F6F8FA"/>
+	 </conditionalStyle>
 	</style>
 	<subDataset name="LineItemDataset" uuid="d30e7c80-bc48-40f0-98c4-960e82d19e87">
 		<parameter name="dateFormat" class="java.lang.String" isForPrompting="false"/>
@@ -87,232 +104,186 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="124" splitType="Stretch">
-			<staticText>
-				<reportElement x="0" y="20" width="595" height="50" uuid="ecab56ef-a62f-486f-bc7d-c1431467efc4"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="26" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Stock Card Report]]></text>
-			</staticText>
-		</band>
-	</title>
 	<pageHeader>
-		<band height="50" splitType="Stretch">
+		<band height="134" splitType="Prevent">
 			<printWhenExpression><![CDATA[new Boolean($V{PAGE_NUMBER}.intValue() == 1)]]></printWhenExpression>
+
+			<!-- Dark navy banner -->
+			<rectangle radius="0">
+				<reportElement x="0" y="0" width="802" height="72" backcolor="#34495E" mode="Opaque"/>
+				<graphicElement><pen lineWidth="0.0"/></graphicElement>
+			</rectangle>
+
+			<!-- Sophelo logo -->
+			<image scaleImage="RetainShape" onErrorType="Blank">
+				<reportElement x="8" y="4" width="64" height="64"/>
+				<imageExpression><![CDATA[new ByteArrayInputStream(org.apache.commons.codec.binary.Base64.decodeBase64("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"))]]></imageExpression>
+			</image>
+
+			<!-- Title -->
 			<staticText>
-				<reportElement x="10" y="0" width="30" height="10" uuid="d88076e4-ce9f-4886-a172-855275a4a5e7">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Facility:]]></text>
+				<reportElement x="84" y="12" width="400" height="28" forecolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="18" isBold="true"/></textElement>
+				<text><![CDATA[Stock Card]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement x="50" y="0" width="100" height="10" uuid="68d8d341-d519-4cd5-adaf-845085a2b343"/>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{facility}.getName()]]></textFieldExpression>
+
+			<!-- Subtitle -->
+			<staticText>
+				<reportElement x="84" y="42" width="400" height="14" forecolor="#D9E8FA"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="7"/></textElement>
+				<text><![CDATA[eLMIS individual stock card by transaction]]></text>
+			</staticText>
+
+			<!-- Ministry of Health -->
+			<staticText>
+				<reportElement x="620" y="46" width="172" height="14" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+				<text><![CDATA[Ministry of Health]]></text>
+			</staticText>
+
+			<!-- GENERATED ON label -->
+			<staticText>
+				<reportElement x="490" y="10" width="122" height="12" forecolor="#D9E8FA"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[GENERATED ON]]></text>
+			</staticText>
+
+			<!-- Generated date/time -->
+			<textField pattern="dd MMM yyyy, HH:mm">
+				<reportElement x="490" y="24" width="122" height="14" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA[DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm").format(ZonedDateTime.now())]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="10" y="20" width="55" height="10" uuid="e70d1a9b-4bcc-460c-8ffe-c238d8d4e9af">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Facility code:]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement x="70" y="20" width="80" height="10" uuid="e28722c1-aff1-4167-af88-1d9b88dc2c81"/>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{facility}.getCode()]]></textFieldExpression>
+
+			<!-- Page number in banner -->
+			<textField>
+				<reportElement x="490" y="46" width="122" height="14" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
+
+			<!-- Info strip background -->
+			<rectangle radius="0">
+				<reportElement x="0" y="78" width="802" height="50" backcolor="#F4F7FB" mode="Opaque"/>
+				<graphicElement><pen lineWidth="0.5" lineColor="#D7E0EA"/></graphicElement>
+			</rectangle>
+
+			<!-- Facility label -->
 			<staticText>
-				<reportElement x="160" y="0" width="40" height="10" uuid="f932b782-290f-45d4-9fdf-f2cc21d3088c">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Program:]]></text>
+				<reportElement x="8" y="82" width="150" height="12"/>
+				<textElement><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[FACILITY]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="210" y="0" width="90" height="10" uuid="090f268a-9013-48d7-bf4c-2d082ce82426">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{program}.getName()]]></textFieldExpression>
+
+			<!-- Facility value -->
+			<textField isBlankWhenNull="true">
+				<reportElement x="8" y="96" width="150" height="28"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA[$F{facility}.getName() + "  (" + $F{facility}.getCode() + ")"]]></textFieldExpression>
 			</textField>
+
+			<!-- Program label -->
 			<staticText>
-				<reportElement x="490" y="0" width="40" height="10" uuid="f233a52e-358f-492e-972b-5893cca24c7f">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[SOH:]]></text>
+				<reportElement x="158" y="82" width="100" height="12"/>
+				<textElement><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[PROGRAM]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement x="520" y="0" width="80" height="10" uuid="83ee175f-b7f6-47ab-97d1-e0e47cbd5ba8"/>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{stockOnHand}).toString()]]></textFieldExpression>
+
+			<!-- Program value -->
+			<textField isBlankWhenNull="true">
+				<reportElement x="158" y="96" width="100" height="28"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA[$F{program}.getName() + "  (" + $F{program}.getCode() + ")"]]></textFieldExpression>
 			</textField>
+
+			<!-- Product label -->
 			<staticText>
-				<reportElement x="160" y="20" width="70" height="10" uuid="dbb8c60d-f18c-4662-82a9-1469ba5ee29b">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Program Code:]]></text>
+				<reportElement x="258" y="82" width="260" height="12"/>
+				<textElement><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[PRODUCT]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="230" y="20" width="90" height="10" uuid="1155efb4-d80b-4867-bc2c-4708e21299cb">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{program}.getCode()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="330" y="20" width="60" height="10" uuid="36cd07bc-b3ce-4e51-b8b1-0cab5457bdd2">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Product Code:]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="400" y="20" width="90" height="10" uuid="86e1db6a-c030-42b4-be86-55aa8a13bffd">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{orderable}.getProductCode()]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="330" y="0" width="40" height="10" uuid="f2a68d39-80e0-4c02-a15e-0b1f7ec1e991">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Product:]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="370" y="0" width="90" height="10" uuid="91c74f77-e92c-4d01-a5c3-39c827cfc9ff">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement>
-					<font size="8"/>
-				</textElement>
+
+			<!-- Product value -->
+			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
+				<reportElement x="258" y="96" width="260" height="28"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
 				<textFieldExpression><![CDATA[$F{orderable}.getFullProductName()]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement x="70" y="40" width="80" height="10" uuid="40f09f1a-ba6b-4bcc-ad3a-0bffbbb8d984">
+
+			<!-- Product code label -->
+			<staticText>
+				<reportElement x="518" y="82" width="130" height="12"/>
+				<textElement><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[PRODUCT CODE]]></text>
+			</staticText>
+
+			<!-- Product code value -->
+			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
+				<reportElement x="518" y="96" width="130" height="28"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+				<textFieldExpression><![CDATA[$F{orderable}.getProductCode()]]></textFieldExpression>
+			</textField>
+
+			<!-- Lot label -->
+			<staticText>
+				<reportElement x="648" y="82" width="80" height="12">
 					<printWhenExpression><![CDATA[$P{hasLot}]]></printWhenExpression>
 				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
+				<textElement><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[LOT]]></text>
+			</staticText>
+
+			<!-- Lot value -->
+			<textField isBlankWhenNull="true">
+				<reportElement x="648" y="96" width="80" height="28">
+					<printWhenExpression><![CDATA[$P{hasLot}]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
 				<textFieldExpression><![CDATA[$F{lot}.getLotCode()]]></textFieldExpression>
 			</textField>
+
+			<!-- Expiry label -->
 			<staticText>
-				<reportElement x="10" y="40" width="55" height="10" uuid="4024885e-f119-4a2f-b74c-98624c2ebb3d">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				<reportElement x="728" y="82" width="70" height="12">
 					<printWhenExpression><![CDATA[$P{hasLot}]]></printWhenExpression>
 				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Lot number:]]></text>
+				<textElement><font fontName="SansSerif" size="7" isBold="true"/></textElement>
+				<text><![CDATA[EXPIRY]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="160" y="40" width="70" height="10" uuid="c8c868e7-79a6-4fd7-af28-8bb754be0c2d">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+
+			<!-- Expiry value -->
+			<textField isBlankWhenNull="true">
+				<reportElement x="728" y="96" width="70" height="28">
 					<printWhenExpression><![CDATA[$P{hasLot}]]></printWhenExpression>
 				</reportElement>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Expiry date:]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="230" y="40" width="90" height="10" uuid="ac3309ea-58c8-4931-a9c2-8af93b151edb">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-					<printWhenExpression><![CDATA[$P{hasLot}]]></printWhenExpression>
-				</reportElement>
-				<textElement>
-					<font size="8"/>
-				</textElement>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
 				<textFieldExpression><![CDATA[DateTimeFormatter.ofPattern($P{dateFormat}).format(LocalDate.parse($F{lot}.getExpirationDate().toString()))]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
 	<pageFooter>
-		<band height="54" splitType="Stretch">
+		<band height="24" splitType="Prevent">
+			<line>
+				<reportElement x="0" y="2" width="802" height="1"/>
+				<graphicElement><pen lineWidth="0.5" lineColor="#CBD2D9"/></graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="7" width="400" height="14" forecolor="#52606D"/>
+				<textElement verticalAlignment="Middle"><font fontName="SansSerif" size="7" isItalic="true"/></textElement>
+				<text><![CDATA[Lesotho eLMIS  •  Ministry of Health  •  Stock Card]]></text>
+			</staticText>
 			<textField>
-				<reportElement x="10" y="24" width="100" height="20" uuid="93290a78-3c39-4e2b-8f2f-638d0fb3267c"/>
-				<textFieldExpression><![CDATA[DateTimeFormatter.ofPattern($P{dateFormat}).format(LocalDate.now())]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="500" y="24" width="40" height="20" uuid="ee62efa8-b6f7-4de5-8ede-1ac3db0020cd"/>
-				<textElement textAlignment="Right"/>
+				<reportElement x="600" y="7" width="202" height="14" forecolor="#52606D"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="7" isBold="true"/></textElement>
 				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report">
-				<reportElement x="540" y="24" width="40" height="20" uuid="fbe34c63-7cfe-41e9-98dd-f1d379e7338c"/>
-				<textElement textAlignment="Left"/>
-				<textFieldExpression><![CDATA[" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="100">
-			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-			<staticText>
-				<reportElement x="10" y="12" width="575" height="20" uuid="7da9e4ae-b08d-4775-95d1-532061acfedb">
-					<printWhenExpression><![CDATA[$F{lineItems} != null]]></printWhenExpression>
-				</reportElement>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Card Line Items]]></text>
-			</staticText>
+		<band height="64">
 			<componentElement>
-				<reportElement x="10" y="35" width="575" height="60" uuid="49aff7ec-0984-4b44-aaf6-ba51725190dd">
-					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+				<reportElement x="0" y="4" width="802" height="60" uuid="49aff7ec-0984-4b44-aaf6-ba51725190dd">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
 					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
@@ -327,149 +298,127 @@
 						</datasetParameter>
 						<dataSourceExpression><![CDATA[new JRBeanCollectionDataSource($F{lineItems})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="80" uuid="7a732a0d-a24a-4968-adbd-c89871de6e04">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
+					<!-- Date - 90px -->
+					<jr:column width="90" uuid="7a732a0d-a24a-4968-adbd-c89871de6e04">
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="79d413a0-e8b1-46b0-8026-16b7fb5193b3"/>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="90" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Date]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="3442e65e-4567-4aa5-9baf-75de733717ed"/>
+								<reportElement x="0" y="0" width="90" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[DateTimeFormatter.ofPattern($P{dateFormat}).format(LocalDate.parse($F{lineItem}.getOccurredDate().toString()))]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="80" uuid="116a8009-1af1-4d47-af29-fa1f1844b120">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+
+					<!-- Received From - 160px -->
+					<jr:column width="160" uuid="116a8009-1af1-4d47-af29-fa1f1844b120">
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="0d289147-887f-40e3-b9dd-a0b83e1e3d5a">
-									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-								</reportElement>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="160" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[Receive from]]></text>
+								<text><![CDATA[Received From]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="f0f02791-44c8-44d8-96e0-15d78068606b"/>
+								<reportElement x="0" y="0" width="160" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{lineItem}.getSourceFreeText() != null ? MessageFormat.format("{0} : {1}", $F{source}.getName(), $F{lineItem}.getSourceFreeText()) :  $F{source}.getName()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="80" uuid="f05dabc3-f83e-4898-a189-f65039db51d2">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
+
+					<!-- Issued To - 160px -->
+					<jr:column width="160" uuid="f05dabc3-f83e-4898-a189-f65039db51d2">
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="80704dca-2510-44bd-9b1b-d8638caa2c29"/>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="160" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[Issue to]]></text>
+								<text><![CDATA[Issued To]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="45281874-eba8-42a9-824b-62e4b04cdf75"/>
+								<reportElement x="0" y="0" width="160" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{lineItem}.getDestinationFreeText() != null ? MessageFormat.format("{0} : {1}", $F{destination}.getName(), $F{lineItem}.getDestinationFreeText()) : $F{destination}.getName()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="80" uuid="ea9fc2dc-0484-41ff-80e9-c47b4779fd27">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+
+					<!-- Reason - 140px -->
+					<jr:column width="140" uuid="ea9fc2dc-0484-41ff-80e9-c47b4779fd27">
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="eec6930c-ab54-49e9-a0f0-dc72b9e5074a">
-									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-								</reportElement>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="140" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Reason]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="2237b77f-d8d1-40c8-9a3c-350b740eecd2"/>
+								<reportElement x="0" y="0" width="140" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{lineItem}.getReasonFreeText() != null ? MessageFormat.format("{0} : {1}", $F{lineItem}.getReason().getName(), $F{lineItem}.getReasonFreeText()) : $F{lineItem}.getReason().getName()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
+
+					<!-- Adjustment - 80px -->
 					<jr:column width="80" uuid="eb96136d-28bf-4269-b2cc-b8af716516a7">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="cfe0820a-6b1d-4ab5-901f-4bba85be9b3a">
-									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-								</reportElement>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="80" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Adjustment]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="109c656e-5a92-4ab3-9578-cf1e39ee1e3d"/>
+								<reportElement x="0" y="0" width="80" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{lineItem}.getQuantity()).toString()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="80" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+
+					<!-- Stock on Hand - 90px -->
+					<jr:column width="90" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="6c86ff17-9c22-4161-95a4-79bc947fb015">
-									<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-								</reportElement>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="90" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[Stock on hand]]></text>
+								<text><![CDATA[Stock on Hand]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="2b8cc7f3-6461-4122-b530-cdacfa242a8c"/>
+								<reportElement x="0" y="0" width="90" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="80" uuid="801ec044-823a-4c00-b96e-7649f3a1858b">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column7"/>
-						<jr:tableHeader style="Table_TH" height="30" rowSpan="1">
-							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+
+					<!-- Signature - 82px -->
+					<jr:column width="82" uuid="801ec044-823a-4c00-b96e-7649f3a1858b">
+						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="80" height="30" uuid="fbcacb14-dc82-482c-b5d3-1dd2884b80bc"/>
-								<box padding="2"/>
+								<reportElement x="0" y="0" width="82" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Signature]]></text>
 							</staticText>
-						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="80" height="30" uuid="ef145284-93eb-4f5f-a9a6-b3c979a527e1"/>
+								<reportElement x="0" y="0" width="82" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{lineItem}.getSignature()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
