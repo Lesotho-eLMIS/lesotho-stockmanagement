@@ -212,7 +212,10 @@ public class PhysicalInventoryController {
     } else {
       mediaType = new MediaType("application", "pdf", StandardCharsets.UTF_8);
     }
-    String fileName = printTemplate.getName().replaceAll("\\s+", "_");
+    // Replaced: Print_PI was the same for every physical inventory. Name it
+    // like the stock card report does, by id, so each download is distinct.
+    // String fileName = printTemplate.getName().replaceAll("\\s+", "_");
+    String fileName = "physical_inventory_" + id;
 
     return ResponseEntity
         .ok()
