@@ -392,7 +392,7 @@
 						</jr:detailCell>
 					</jr:column>
 
-					<!-- Stock on Hand: Packs - 60px -->
+					<!-- Old header: Packs/Units columns each repeated "Stock on Hand" above "Packs"/"Units" separately, wrapping as two independent header cells instead of a single shared span
 					<jr:column width="60" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
 						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
@@ -415,7 +415,6 @@
 						</jr:detailCell>
 					</jr:column>
 
-					<!-- Stock on Hand: Units - 60px -->
 					<jr:column width="60" uuid="a9f1e2b3-6c7d-48a0-9e1f-2d3c4b5a6e7f">
 						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
@@ -437,6 +436,51 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
+					-->
+					<!-- Stock on Hand: Packs + Units - 120px, shared group header -->
+					<jr:columnGroup width="120">
+						<jr:columnHeader style="TableHeader" height="17">
+							<staticText>
+								<reportElement x="0" y="0" width="120" height="17" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Stock on Hand]]></text>
+							</staticText>
+						</jr:columnHeader>
+
+						<jr:column width="60" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
+							<jr:columnHeader style="TableHeader" height="17">
+								<staticText>
+									<reportElement x="0" y="0" width="60" height="17" forecolor="#FFFFFF"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle"/>
+									<text><![CDATA[Packs]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="TableCell" height="26">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="60" height="26" stretchType="RelativeToTallestObject"/>
+									<box padding="2"/>
+									<textFieldExpression><![CDATA[($P{netContent} != null && $P{netContent} != 0) ? $P{decimalFormat}.format($F{lineItem}.getStockOnHand() / $P{netContent}.intValue()).toString() : $P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+
+						<jr:column width="60" uuid="a9f1e2b3-6c7d-48a0-9e1f-2d3c4b5a6e7f">
+							<jr:columnHeader style="TableHeader" height="17">
+								<staticText>
+									<reportElement x="0" y="0" width="60" height="17" forecolor="#FFFFFF"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle"/>
+									<text><![CDATA[Units]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="TableCell" height="26">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="60" height="26" stretchType="RelativeToTallestObject"/>
+									<box padding="2"/>
+									<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
 
 					<!-- Signature - 82px -->
 					<jr:column width="82" uuid="801ec044-823a-4c00-b96e-7649f3a1858b">
