@@ -304,7 +304,7 @@
 					</datasetRun>
 					<!-- Date - 90px -->
 					<jr:column width="90" uuid="7a732a0d-a24a-4968-adbd-c89871de6e04">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -322,7 +322,7 @@
 
 					<!-- Received From - 145px -->
 					<jr:column width="145" uuid="116a8009-1af1-4d47-af29-fa1f1844b120">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="145" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -340,7 +340,7 @@
 
 					<!-- Issued To - 145px -->
 					<jr:column width="145" uuid="f05dabc3-f83e-4898-a189-f65039db51d2">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="145" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -358,7 +358,7 @@
 
 					<!-- Reason - 140px -->
 					<jr:column width="140" uuid="ea9fc2dc-0484-41ff-80e9-c47b4779fd27">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="140" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -376,7 +376,7 @@
 
 					<!-- Adjustment - 80px -->
 					<jr:column width="80" uuid="eb96136d-28bf-4269-b2cc-b8af716516a7">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="80" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -484,7 +484,7 @@
 
 					<!-- Signature - 82px -->
 					<jr:column width="82" uuid="801ec044-823a-4c00-b96e-7649f3a1858b">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="82" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
