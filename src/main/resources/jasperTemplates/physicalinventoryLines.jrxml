@@ -112,6 +112,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$V{quantitySumValue} != null ? $P{decimalFormat}.format($V{quantitySumValue}).toString() : ""]]></textFieldExpression>
 				</textField>
+				<!-- Old expression printed blank for null sohSumValue - null means the lot had no stock before the count, so show 0 -->
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="productGroup">
 					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="436" y="0" width="55" height="25" forecolor="#848484" uuid="645d8796-62da-4da4-a69e-7bcb1ecf07cb"/>
 					<box padding="3">
@@ -120,8 +121,9 @@
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[($V{sohSumValue} != null && $F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format($V{sohSumValue} / $F{netcontent}.intValue()).toString() : ($V{sohSumValue} != null ? $P{decimalFormat}.format($V{sohSumValue}).toString() : "")]]></textFieldExpression>
+					<textFieldExpression><![CDATA[($F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format(($V{sohSumValue} != null ? $V{sohSumValue} : 0) / $F{netcontent}.intValue()).toString() : $P{decimalFormat}.format($V{sohSumValue} != null ? $V{sohSumValue} : 0).toString()]]></textFieldExpression>
 				</textField>
+				<!-- Old expression printed blank for null sohSumValue - null means the lot had no stock before the count, so show 0 -->
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="productGroup">
 					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="491" y="0" width="55" height="25" forecolor="#848484" uuid="dd75525d-17ac-4e08-9424-89c3cbbca98d"/>
 					<box padding="3">
@@ -130,7 +132,7 @@
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{sohSumValue} != null ? $P{decimalFormat}.format($V{sohSumValue}).toString() : ""]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{decimalFormat}.format($V{sohSumValue} != null ? $V{sohSumValue} : 0).toString()]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="376" y="0" width="60" height="25" uuid="d07d08b5-df52-43b1-b3d0-d571623c8b02"/>
@@ -356,6 +358,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[(new org.json.JSONObject($F{extradata}).getString("vvmStatus")) == "null" ? "" : new org.json.JSONObject($F{extradata}).getString("vvmStatus")]]></textFieldExpression>
 			</textField>
+			<!-- Old expression printed blank for null soh - null means the lot had no stock before the count, so show 0 -->
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
 				<reportElement x="436" y="0" width="55" height="25" printWhenGroupChanges="lineItemGroup" forecolor="#848484" uuid="9575a725-9dcb-4428-b6c9-bb25d57804c6">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
@@ -369,8 +372,9 @@
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{soh} != null && $F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format($F{soh} / $F{netcontent}.intValue()).toString() : ($F{soh} != null ? $P{decimalFormat}.format($F{soh}).toString() : "")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format(($F{soh} != null ? $F{soh} : 0) / $F{netcontent}.intValue()).toString() : $P{decimalFormat}.format($F{soh} != null ? $F{soh} : 0).toString()]]></textFieldExpression>
 			</textField>
+			<!-- Old expression printed blank for null soh - null means the lot had no stock before the count, so show 0 -->
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
 				<reportElement x="491" y="0" width="55" height="25" printWhenGroupChanges="lineItemGroup" forecolor="#848484" uuid="dd92b08a-fd06-4279-bbb0-2206b38f9a84">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
@@ -384,7 +388,7 @@
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{soh} != null ? $P{decimalFormat}.format($F{soh}).toString() : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{soh} != null ? $F{soh} : 0).toString()]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
 				<reportElement x="546" y="0" width="55" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="fd4be611-74c3-4ed9-af8c-7252e64b4d5b">
