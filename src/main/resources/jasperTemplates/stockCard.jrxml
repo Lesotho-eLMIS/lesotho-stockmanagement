@@ -64,6 +64,7 @@
 	<subDataset name="LineItemDataset" uuid="d30e7c80-bc48-40f0-98c4-960e82d19e87">
 		<parameter name="dateFormat" class="java.lang.String" isForPrompting="false"/>
 		<parameter name="decimalFormat" class="java.text.DecimalFormat" isForPrompting="false"/>
+		<parameter name="netContent" class="java.lang.Long" isForPrompting="false"/>
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
@@ -296,11 +297,14 @@
 						<datasetParameter name="decimalFormat">
 							<datasetParameterExpression><![CDATA[$P{decimalFormat}]]></datasetParameterExpression>
 						</datasetParameter>
+						<datasetParameter name="netContent">
+							<datasetParameterExpression><![CDATA[$F{orderable} != null ? $F{orderable}.getNetContent() : null]]></datasetParameterExpression>
+						</datasetParameter>
 						<dataSourceExpression><![CDATA[new JRBeanCollectionDataSource($F{lineItems})]]></dataSourceExpression>
 					</datasetRun>
 					<!-- Date - 90px -->
 					<jr:column width="90" uuid="7a732a0d-a24a-4968-adbd-c89871de6e04">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -316,36 +320,36 @@
 						</jr:detailCell>
 					</jr:column>
 
-					<!-- Received From - 160px -->
-					<jr:column width="160" uuid="116a8009-1af1-4d47-af29-fa1f1844b120">
-						<jr:columnHeader style="TableHeader" height="34">
+					<!-- Received From - 145px -->
+					<jr:column width="145" uuid="116a8009-1af1-4d47-af29-fa1f1844b120">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
-								<reportElement x="0" y="0" width="160" height="34" forecolor="#FFFFFF"/>
+								<reportElement x="0" y="0" width="145" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Received From]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="160" height="26" stretchType="RelativeToTallestObject"/>
+								<reportElement x="0" y="0" width="145" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
 								<textFieldExpression><![CDATA[$F{lineItem}.getSourceFreeText() != null ? MessageFormat.format("{0} : {1}", $F{source}.getName(), $F{lineItem}.getSourceFreeText()) :  $F{source}.getName()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 
-					<!-- Issued To - 160px -->
-					<jr:column width="160" uuid="f05dabc3-f83e-4898-a189-f65039db51d2">
-						<jr:columnHeader style="TableHeader" height="34">
+					<!-- Issued To - 145px -->
+					<jr:column width="145" uuid="f05dabc3-f83e-4898-a189-f65039db51d2">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
-								<reportElement x="0" y="0" width="160" height="34" forecolor="#FFFFFF"/>
+								<reportElement x="0" y="0" width="145" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Issued To]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="160" height="26" stretchType="RelativeToTallestObject"/>
+								<reportElement x="0" y="0" width="145" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
 								<textFieldExpression><![CDATA[$F{lineItem}.getDestinationFreeText() != null ? MessageFormat.format("{0} : {1}", $F{destination}.getName(), $F{lineItem}.getDestinationFreeText()) : $F{destination}.getName()]]></textFieldExpression>
 							</textField>
@@ -354,7 +358,7 @@
 
 					<!-- Reason - 140px -->
 					<jr:column width="140" uuid="ea9fc2dc-0484-41ff-80e9-c47b4779fd27">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="140" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -372,7 +376,7 @@
 
 					<!-- Adjustment - 80px -->
 					<jr:column width="80" uuid="eb96136d-28bf-4269-b2cc-b8af716516a7">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="80" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -388,27 +392,99 @@
 						</jr:detailCell>
 					</jr:column>
 
-					<!-- Stock on Hand - 90px -->
-					<jr:column width="90" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
+					<!-- Old header: Packs/Units columns each repeated "Stock on Hand" above "Packs"/"Units" separately, wrapping as two independent header cells instead of a single shared span
+					<jr:column width="60" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
 						<jr:columnHeader style="TableHeader" height="34">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="34" forecolor="#FFFFFF"/>
+								<reportElement x="0" y="0" width="60" height="17" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Stock on Hand]]></text>
+							</staticText>
+							<staticText>
+								<reportElement x="0" y="17" width="60" height="17" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Packs]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="TableCell" height="26">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="90" height="26" stretchType="RelativeToTallestObject"/>
+								<reportElement x="0" y="0" width="60" height="26" stretchType="RelativeToTallestObject"/>
+								<box padding="2"/>
+								<textFieldExpression><![CDATA[($P{netContent} != null && $P{netContent} != 0) ? $P{decimalFormat}.format($F{lineItem}.getStockOnHand() / $P{netContent}.intValue()).toString() : $P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+
+					<jr:column width="60" uuid="a9f1e2b3-6c7d-48a0-9e1f-2d3c4b5a6e7f">
+						<jr:columnHeader style="TableHeader" height="34">
+							<staticText>
+								<reportElement x="0" y="0" width="60" height="17" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Stock on Hand]]></text>
+							</staticText>
+							<staticText>
+								<reportElement x="0" y="17" width="60" height="17" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Units]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="TableCell" height="26">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="60" height="26" stretchType="RelativeToTallestObject"/>
 								<box padding="2"/>
 								<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
+					-->
+					<!-- Stock on Hand: Packs + Units - 120px, shared group header -->
+					<jr:columnGroup width="120">
+						<jr:columnHeader style="TableHeader" height="17">
+							<staticText>
+								<reportElement x="0" y="0" width="120" height="17" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Stock on Hand]]></text>
+							</staticText>
+						</jr:columnHeader>
+
+						<jr:column width="60" uuid="dc6dd8dc-5535-40c7-a4ff-3f32c16a5b98">
+							<jr:columnHeader style="TableHeader" height="17">
+								<staticText>
+									<reportElement x="0" y="0" width="60" height="17" forecolor="#FFFFFF"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle"/>
+									<text><![CDATA[Packs]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="TableCell" height="26">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="60" height="26" stretchType="RelativeToTallestObject"/>
+									<box padding="2"/>
+									<textFieldExpression><![CDATA[($P{netContent} != null && $P{netContent} != 0) ? $P{decimalFormat}.format($F{lineItem}.getStockOnHand() / $P{netContent}.intValue()).toString() : $P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+
+						<jr:column width="60" uuid="a9f1e2b3-6c7d-48a0-9e1f-2d3c4b5a6e7f">
+							<jr:columnHeader style="TableHeader" height="17">
+								<staticText>
+									<reportElement x="0" y="0" width="60" height="17" forecolor="#FFFFFF"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle"/>
+									<text><![CDATA[Units]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="TableCell" height="26">
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement x="0" y="0" width="60" height="26" stretchType="RelativeToTallestObject"/>
+									<box padding="2"/>
+									<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{lineItem}.getStockOnHand()).toString()]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
 
 					<!-- Signature - 82px -->
 					<jr:column width="82" uuid="801ec044-823a-4c00-b96e-7649f3a1858b">
-						<jr:columnHeader style="TableHeader" height="34">
+						<jr:columnHeader style="TableHeader" height="34" rowSpan="2">
 							<staticText>
 								<reportElement x="0" y="0" width="82" height="34" forecolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>

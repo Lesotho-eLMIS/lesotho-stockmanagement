@@ -18,6 +18,7 @@
 			select max(rownum) as max_row_num,
 					o.code as productcode,
 					o.fullproductname as productname,
+					o.netcontent as netcontent,
 					l.lotcode as lotcode,
 					l.expirationdate as expirationdate,
 					pil.quantity,
@@ -36,11 +37,12 @@
 				LEFT JOIN stockmanagement.physical_inventory_line_item_adjustments adj on adj.physicalinventorylineitemid = pil.id
 				LEFT JOIN stockmanagement.stock_card_line_item_reasons r on r.id = adj.reasonid
 				WHERE pi.id = $P!{pi_id} AND pil.quantity IS NOT NULL
-				GROUP BY o.code, o.fullproductname, l.lotcode, l.expirationdate, pil.quantity, pil.previousstockonhandwhensubmitted, pil.extradata, adj.quantity, adj.id, r.name, odc.displayname, odc.displayorder
+				GROUP BY o.code, o.fullproductname, o.netcontent, l.lotcode, l.expirationdate, pil.quantity, pil.previousstockonhandwhensubmitted, pil.extradata, adj.quantity, adj.id, r.name, odc.displayname, odc.displayorder
 				ORDER BY odc.displayorder, o.code, l.lotcode NULLS FIRST]]>
 	</queryString>
 	<field name="productcode" class="java.lang.String"/>
 	<field name="productname" class="java.lang.String"/>
+	<field name="netcontent" class="java.lang.Long"/>
 	<field name="lotcode" class="java.lang.String"/>
 	<field name="expirationdate" class="java.lang.String"/>
 	<field name="quantity" class="java.lang.Integer"/>
@@ -85,13 +87,23 @@
 		<groupHeader>
 			<band height="25" splitType="Stretch">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="624" y="0" width="178" height="25" uuid="dc09a9f2-acf7-4dab-84ef-a500845dde6d"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="656" y="0" width="146" height="25" uuid="dc09a9f2-acf7-4dab-84ef-a500845dde6d"/>
 					<box padding="3">
 						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
 					</box>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="productGroup">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="544" y="0" width="80" height="25" forecolor="#1F2933" uuid="1dd698e8-9aae-4cd6-94b9-708523090dec"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="546" y="0" width="55" height="25" forecolor="#1F2933" uuid="0d329030-eef6-4e43-81e0-9280e926a9b8"/>
+					<box padding="3">
+						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($V{quantitySumValue} != null && $F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format($V{quantitySumValue} / $F{netcontent}.intValue()).toString() : ($V{quantitySumValue} != null ? $P{decimalFormat}.format($V{quantitySumValue}).toString() : "")]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="productGroup">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="601" y="0" width="55" height="25" forecolor="#1F2933" uuid="348106ad-15c6-45be-810d-1c464d3715e2"/>
 					<box padding="3">
 						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
 					</box>
@@ -100,36 +112,48 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$V{quantitySumValue} != null ? $P{decimalFormat}.format($V{quantitySumValue}).toString() : ""]]></textFieldExpression>
 				</textField>
+				<!-- Old expression printed blank for null sohSumValue - null means the lot had no stock before the count, so show 0 -->
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="productGroup">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="464" y="0" width="80" height="25" forecolor="#848484" uuid="d2a96208-ada5-4412-bdc6-3ab766acbf7e"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="436" y="0" width="55" height="25" forecolor="#848484" uuid="645d8796-62da-4da4-a69e-7bcb1ecf07cb"/>
 					<box padding="3">
 						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
 					</box>
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$V{sohSumValue} != null ? $P{decimalFormat}.format($V{sohSumValue}).toString() : ""]]></textFieldExpression>
+					<textFieldExpression><![CDATA[($F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format(($V{sohSumValue} != null ? $V{sohSumValue} : 0) / $F{netcontent}.intValue()).toString() : $P{decimalFormat}.format($V{sohSumValue} != null ? $V{sohSumValue} : 0).toString()]]></textFieldExpression>
+				</textField>
+				<!-- Old expression printed blank for null sohSumValue - null means the lot had no stock before the count, so show 0 -->
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="productGroup">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="491" y="0" width="55" height="25" forecolor="#848484" uuid="dd75525d-17ac-4e08-9424-89c3cbbca98d"/>
+					<box padding="3">
+						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{decimalFormat}.format($V{sohSumValue} != null ? $V{sohSumValue} : 0).toString()]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="394" y="0" width="70" height="25" uuid="d07d08b5-df52-43b1-b3d0-d571623c8b02"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="376" y="0" width="60" height="25" uuid="d07d08b5-df52-43b1-b3d0-d571623c8b02"/>
 					<box padding="3">
 						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
 					</box>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="314" y="0" width="80" height="25" uuid="dc2ac7c8-1086-49d9-90fb-9acd95271092"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="304" y="0" width="72" height="25" uuid="dc2ac7c8-1086-49d9-90fb-9acd95271092"/>
 					<box padding="3">
 						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
 					</box>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="242" y="0" width="72" height="25" uuid="93bc4e67-36dd-4077-95db-0db852108a30"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="232" y="0" width="72" height="25" uuid="93bc4e67-36dd-4077-95db-0db852108a30"/>
 					<box padding="3">
 						<pen lineWidth="0.3" lineColor="#C8D2DC"/>
 					</box>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="72" y="0" width="170" height="25" forecolor="#1F2933" uuid="f75fae81-e6b8-4993-898d-632ddf29d1e8"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="72" y="0" width="160" height="25" forecolor="#1F2933" uuid="f75fae81-e6b8-4993-898d-632ddf29d1e8"/>
 					<box padding="3">
 						<topPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
 						<leftPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
@@ -166,7 +190,7 @@
 	<columnHeader>
 		<band height="34" splitType="Stretch">
 			<staticText>
-				<reportElement mode="Opaque" x="624" y="0" width="178" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="dc09a9f2-acf7-4dab-84ef-a500845dde6d"/>
+				<reportElement mode="Opaque" x="656" y="0" width="146" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="dc09a9f2-acf7-4dab-84ef-a500845dde6d"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -176,7 +200,7 @@
 				<text><![CDATA[Itemized reasons]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="544" y="0" width="80" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="1dd698e8-9aae-4cd6-94b9-708523090dec"/>
+				<reportElement mode="Opaque" x="546" y="0" width="110" height="17" backcolor="#34495E" forecolor="#FFFFFF" uuid="fa9482a6-30ec-429b-9c86-5a59c1eb2ad4"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -186,7 +210,27 @@
 				<text><![CDATA[Current Stock]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="464" y="0" width="80" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="d2a96208-ada5-4412-bdc6-3ab766acbf7e"/>
+				<reportElement mode="Opaque" x="546" y="17" width="55" height="17" backcolor="#34495E" forecolor="#FFFFFF" uuid="205b499d-79f5-4fd8-9d73-ff3772a5f7e9"/>
+				<box padding="3">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Packs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="601" y="17" width="55" height="17" backcolor="#34495E" forecolor="#FFFFFF" uuid="b2e0e0e5-2522-403f-a475-c3d4e3a0fcd7"/>
+				<box padding="3">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Units]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="436" y="0" width="110" height="17" backcolor="#34495E" forecolor="#FFFFFF" uuid="801b093f-8a8d-449b-9f5a-43312303f3b0"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -196,7 +240,27 @@
 				<text><![CDATA[Stock On Hand]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="394" y="0" width="70" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="d07d08b5-df52-43b1-b3d0-d571623c8b02"/>
+				<reportElement mode="Opaque" x="436" y="17" width="55" height="17" backcolor="#34495E" forecolor="#FFFFFF" uuid="305b2dc3-9f87-4e49-841a-6f3ac1883dd3"/>
+				<box padding="3">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Packs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="491" y="17" width="55" height="17" backcolor="#34495E" forecolor="#FFFFFF" uuid="a9a7d4ab-d0dd-4728-86a3-bb905250a54d"/>
+				<box padding="3">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Units]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="376" y="0" width="60" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="d07d08b5-df52-43b1-b3d0-d571623c8b02"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -206,7 +270,7 @@
 				<text><![CDATA[VVM Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="314" y="0" width="80" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="dc2ac7c8-1086-49d9-90fb-9acd95271092"/>
+				<reportElement mode="Opaque" x="304" y="0" width="72" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="dc2ac7c8-1086-49d9-90fb-9acd95271092"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -216,7 +280,7 @@
 				<text><![CDATA[Expiry date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="242" y="0" width="72" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="93bc4e67-36dd-4077-95db-0db852108a30"/>
+				<reportElement mode="Opaque" x="232" y="0" width="72" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="93bc4e67-36dd-4077-95db-0db852108a30"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -226,7 +290,7 @@
 				<text><![CDATA[Lot code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="72" y="0" width="170" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="f75fae81-e6b8-4993-898d-632ddf29d1e8"/>
+				<reportElement mode="Opaque" x="72" y="0" width="160" height="34" backcolor="#34495E" forecolor="#FFFFFF" uuid="f75fae81-e6b8-4993-898d-632ddf29d1e8"/>
 				<box padding="3">
 					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
 				</box>
@@ -250,7 +314,7 @@
 	<detail>
 		<band height="25" splitType="Stretch">
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
-				<reportElement x="242" y="0" width="72" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="c649aa2d-900a-4d7f-94f7-0d072c516c0a">
+				<reportElement x="232" y="0" width="72" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="c649aa2d-900a-4d7f-94f7-0d072c516c0a">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
 				</reportElement>
 				<box padding="3">
@@ -265,7 +329,7 @@
 				<textFieldExpression><![CDATA[($F{lotcode} == null) ? "No lot defined" : $F{lotcode}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
-				<reportElement x="314" y="0" width="80" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="0e217f2e-f7ca-4c05-b9d2-f13ec6cf38db">
+				<reportElement x="304" y="0" width="72" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="0e217f2e-f7ca-4c05-b9d2-f13ec6cf38db">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
 				</reportElement>
 				<box padding="3">
@@ -280,7 +344,7 @@
 				<textFieldExpression><![CDATA[DateTimeFormatter.ofPattern($P{dateFormat}).format(LocalDate.parse($F{expirationdate}))]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
-				<reportElement x="394" y="0" width="70" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="a7672f9a-30bd-4bf9-96af-324baa7e2280">
+				<reportElement x="376" y="0" width="60" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="a7672f9a-30bd-4bf9-96af-324baa7e2280">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
 				</reportElement>
 				<box padding="3">
@@ -294,8 +358,9 @@
 				</textElement>
 				<textFieldExpression><![CDATA[(new org.json.JSONObject($F{extradata}).getString("vvmStatus")) == "null" ? "" : new org.json.JSONObject($F{extradata}).getString("vvmStatus")]]></textFieldExpression>
 			</textField>
+			<!-- Old expression printed blank for null soh - null means the lot had no stock before the count, so show 0 -->
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
-				<reportElement x="464" y="0" width="80" height="25" printWhenGroupChanges="lineItemGroup" forecolor="#848484" uuid="547fa08c-24e6-4617-aa94-09384a952a19">
+				<reportElement x="436" y="0" width="55" height="25" printWhenGroupChanges="lineItemGroup" forecolor="#848484" uuid="9575a725-9dcb-4428-b6c9-bb25d57804c6">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
 				</reportElement>
 				<box padding="3">
@@ -307,10 +372,41 @@
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{soh} != null ? $P{decimalFormat}.format($F{soh}).toString() : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format(($F{soh} != null ? $F{soh} : 0) / $F{netcontent}.intValue()).toString() : $P{decimalFormat}.format($F{soh} != null ? $F{soh} : 0).toString()]]></textFieldExpression>
+			</textField>
+			<!-- Old expression printed blank for null soh - null means the lot had no stock before the count, so show 0 -->
+			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
+				<reportElement x="491" y="0" width="55" height="25" printWhenGroupChanges="lineItemGroup" forecolor="#848484" uuid="dd92b08a-fd06-4279-bbb0-2206b38f9a84">
+					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
+				</reportElement>
+				<box padding="3">
+					<topPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{decimalFormat}.format($F{soh} != null ? $F{soh} : 0).toString()]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
-				<reportElement x="544" y="0" width="80" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="a2c8fc54-7cdc-442a-9ced-608a01ef270b">
+				<reportElement x="546" y="0" width="55" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="fd4be611-74c3-4ed9-af8c-7252e64b4d5b">
+					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
+				</reportElement>
+				<box padding="3">
+					<topPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{quantity} != null && $F{netcontent} != null && $F{netcontent} != 0) ? $P{decimalFormat}.format($F{quantity} / $F{netcontent}.intValue()).toString() : ($F{quantity} != null ? $P{decimalFormat}.format($F{quantity}).toString() : "")]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Group" evaluationGroup="lineItemGroup" isBlankWhenNull="true">
+				<reportElement x="601" y="0" width="55" height="25" forecolor="#1F2933" printWhenGroupChanges="lineItemGroup" uuid="6ec38eac-95f9-4a8e-bfc7-30a6efb0f6a6">
 					<printWhenExpression><![CDATA[$V{lineItemGroup_COUNT} == 1]]></printWhenExpression>
 				</reportElement>
 				<box padding="3">
@@ -325,7 +421,7 @@
 				<textFieldExpression><![CDATA[$F{quantity} != null ? $P{decimalFormat}.format($F{quantity}).toString() : ""]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="624" y="0" width="178" height="25" forecolor="#1F2933" uuid="86886d4d-e188-4bbf-bfc7-113325f40773"/>
+				<reportElement x="656" y="0" width="146" height="25" forecolor="#1F2933" uuid="86886d4d-e188-4bbf-bfc7-113325f40773"/>
 				<box padding="3">
 					<topPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
 					<leftPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
@@ -347,7 +443,7 @@
 				</box>
 			</staticText>
 			<staticText>
-				<reportElement x="72" y="0" width="170" height="25" uuid="fa240131-8b7e-4a65-98df-10999828a02c"/>
+				<reportElement x="72" y="0" width="160" height="25" uuid="fa240131-8b7e-4a65-98df-10999828a02c"/>
 				<box padding="3">
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
 					<leftPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
@@ -356,7 +452,7 @@
 				</box>
 			</staticText>
 			<staticText>
-				<reportElement x="314" y="0" width="80" height="25" uuid="ebc8760d-d268-41e6-aae9-fb96082fe7bd"/>
+				<reportElement x="304" y="0" width="72" height="25" uuid="ebc8760d-d268-41e6-aae9-fb96082fe7bd"/>
 				<box padding="3">
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
 					<leftPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
@@ -365,7 +461,7 @@
 				</box>
 			</staticText>
 			<staticText>
-				<reportElement x="464" y="0" width="80" height="25" uuid="60e82caa-8c9f-4334-a7ab-e07f3101c1a7"/>
+				<reportElement x="436" y="0" width="110" height="25" uuid="60e82caa-8c9f-4334-a7ab-e07f3101c1a7"/>
 				<box padding="3">
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#C8D2DC"/>
 					<leftPen lineWidth="0.3" lineStyle="Solid" lineColor="#C8D2DC"/>
