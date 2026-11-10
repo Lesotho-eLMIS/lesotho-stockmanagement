@@ -51,8 +51,6 @@ public class PhysicalInventoryDto {
 
   private Boolean isDraft;
 
-  private UUID stockEventId;
-
   private List<PhysicalInventoryLineItemDto> lineItems;
 
   /**
@@ -114,7 +112,6 @@ public class PhysicalInventoryDto {
         .signature(inventory.getSignature())
         .isStarter(false)
         .isDraft(inventory.getIsDraft())
-        .stockEventId(inventory.getStockEvent() != null ? inventory.getStockEvent().getId() : null)
         .lineItems(inventory.getLineItems().stream().map(
             PhysicalInventoryLineItemDto::from).collect(toList()))
         .build();
